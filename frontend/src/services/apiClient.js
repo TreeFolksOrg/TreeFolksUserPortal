@@ -3,15 +3,27 @@ import axios from 'axios';
 import { auth } from '../firebase';
 
 // --- Configuration ---
-const DEFAULT_API_BASE = import.meta.env.MODE === 'production'
-  ? 'https://tree-folks-user-portal-backend.vercel.app'
-  : 'http://localhost:3000';
-const apiBaseFromEnv = (import.meta?.env?.VITE_API_BASE_URL || DEFAULT_API_BASE).replace(/\/$/, '');
+// For combined Heroku deployment, use relative URL (empty string)
+// For separate deployments, use full URL from environment variable
+const getApiBase = () => {
+  // If VITE_API_BASE_URL is explicitly set, use it
+  if (import.meta?.env?.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+  }
+  // In production without explicit URL, assume combined deployment (relative URL)
+  if (import.meta.env.MODE === 'production') {
+    return '';
+  }
+  // Local development default
+  return 'http://localhost:3000';
+};
+
+const apiBaseFromEnv = getApiBase();
 const apiPrefix = import.meta?.env?.VITE_API_PREFIX ?? '/api';
 
 console.log('API Configuration:', {
   envValue: import.meta?.env?.VITE_API_BASE_URL,
-  finalBase: apiBaseFromEnv,
+  finalBase: apiBaseFromEnv || '(relative - same origin)',
   fullURL: `${apiBaseFromEnv}${apiPrefix}`
 });
 

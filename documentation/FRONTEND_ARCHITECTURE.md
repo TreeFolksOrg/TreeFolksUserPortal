@@ -63,7 +63,6 @@ VITE_API_PREFIX=/api
 # ============================================
 # Personal Access Token - get from https://airtable.com/create/tokens
 AIRTABLE_PAT=patXXXXXXXXXXXXXX.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
 # Base ID - from your Airtable URL: https://airtable.com/appXXXXXXXXXXXXXX/...
 AIRTABLE_BASE_ID=appXXXXXXXXXXXXXX
 
