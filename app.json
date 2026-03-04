@@ -1,0 +1,55 @@
+{
+  "name": "TreeFolks User Portal",
+  "description": "Full-stack application for tracking tree planting projects with Airtable integration",
+  "repository": "https://github.com/your-username/TreeFolksUserPortal",
+  "keywords": ["react", "express", "airtable", "firebase", "cloudinary"],
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment mode",
+      "value": "production"
+    },
+    "AIRTABLE_PAT": {
+      "description": "Airtable Personal Access Token",
+      "required": true
+    },
+    "AIRTABLE_BASE_ID": {
+      "description": "Airtable Base ID (starts with 'app')",
+      "required": true
+    },
+    "AIRTABLE_TABLE_ID": {
+      "description": "Airtable Table ID (starts with 'tbl')",
+      "required": true
+    },
+    "AIRTABLE_SEASON_FIELD_ID": {
+      "description": "Airtable Season Field ID (starts with 'fld')",
+      "required": true
+    },
+    "AIRTABLE_API_URL": {
+      "description": "Airtable API URL",
+      "value": "https://api.airtable.com"
+    },
+    "FIREBASE_SERVICE_ACCOUNT_JSON": {
+      "description": "Firebase Service Account JSON (single line, escaped)",
+      "required": true
+    },
+    "CLOUDINARY_URL": {
+      "description": "Cloudinary URL (cloudinary://key:secret@cloud_name)",
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "scripts": {
+    "postdeploy": "echo 'Deployment complete!'"
+  }
+}

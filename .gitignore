@@ -27,4 +27,9 @@ dist-ssr
 **/.DS_Store
 backend/uploads
 
+# Python virtual environment (not needed for deployment)
+venv/
+__pycache__/
+*.py[cod]
+
 CLAUDE.md

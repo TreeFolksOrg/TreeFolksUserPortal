@@ -108,4 +108,53 @@ root/
 ## 🛠️ Mock Data & Testing
 
 - The `mock_data` directory contains an `.env` file that can be used for reference or by local utility scripts.
+
+## 🚢 Heroku Deployment
+
+This project supports combined deployment to Heroku (frontend + backend as a single app).
+
+### One-Time Setup
+
+```bash
+# 1. Login to Heroku
+heroku login
+
+# 2. Create a new Heroku app
+heroku create your-app-name
+
+# 3. Set environment variables
+heroku config:set \
+  NODE_ENV=production \
+  AIRTABLE_PAT=your_personal_access_token \
+  AIRTABLE_BASE_ID=your_base_id \
+  AIRTABLE_TABLE_ID=your_table_id \
+  AIRTABLE_SEASON_FIELD_ID=your_field_id \
+  AIRTABLE_API_URL=https://api.airtable.com \
+  FIREBASE_SERVICE_ACCOUNT_JSON='{"type":"service_account",...}' \
+  CLOUDINARY_URL=cloudinary://key:secret@cloud_name
+
+# 4. Deploy
+git push heroku main
+```
+
+### What Happens on Deploy
+
+1. Heroku runs `npm install` at root level
+2. `heroku-postbuild` script builds the frontend (`frontend/dist`)
+3. Express server starts and serves both API routes (`/api/*`) and frontend static files
+
+### Updating the App
+
+```bash
+# Make changes, commit, then push
+git add .
+git commit -m "Your changes"
+git push heroku main
+```
+
+### Viewing Logs
+
+```bash
+heroku logs --tail
+```
 - When running locally, ensure your backend `.env` is properly configured to avoid API errors.

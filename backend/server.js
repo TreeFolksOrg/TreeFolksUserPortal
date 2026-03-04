@@ -2,8 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-// const fs = require('fs'); // Not needed for serverless
-// const path = require('path'); // Not needed for serverless
+const path = require('path');
 const airtableRoutes = require('./routes/airtableRoutes');
 
 const app = express();
@@ -24,8 +23,10 @@ const corsOptions = {
             'http://localhost:3000',
             'https://tree-folks-user-portal-frontend.vercel.app'
         ];
-        // Allow requests with no origin (like mobile apps or curl requests)
+        // Allow requests with no origin (same-origin requests, mobile apps, curl)
         if (!origin) return callback(null, true);
+        // In production combined deployment, allow same-origin
+        if (process.env.HEROKU_APP_NAME) return callback(null, true);
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
@@ -62,9 +63,22 @@ app.use((req, res, next) => {
 // --- Routes ---
 app.use('/api', airtableRoutes); // Mount our Airtable specific routes
 
-// --- Basic Root Route ---
-app.get('/', (req, res) => {
-    res.send('Airtable Backend API is running!');
+// --- Serve Frontend Static Files (Heroku Combined Deployment) ---
+const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendBuildPath));
+
+// --- SPA Fallback - Serve index.html for non-API routes ---
+app.get('*', (req, res, next) => {
+    // Skip if this is an API route
+    if (req.path.startsWith('/api')) {
+        return next();
+    }
+    res.sendFile(path.join(frontendBuildPath, 'index.html'), (err) => {
+        if (err) {
+            // If frontend not built yet, show API status
+            res.send('TreeFolks Portal API is running! Frontend not built yet.');
+        }
+    });
 });
 
 // --- Global Error Handler (Basic) ---
@@ -77,9 +91,12 @@ app.use((err, req, res, next) => {
     });
 });
 
-// --- Start Server (for local development only) ---
-// In Vercel, we export the app instead of listening
-if (process.env.NODE_ENV !== 'production') {
+// --- Start Server ---
+// For Heroku and local development, always start the server
+// For Vercel, we export the app instead
+const isVercel = process.env.VERCEL === '1';
+
+if (!isVercel) {
     const server = app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);
         if (!process.env.AIRTABLE_PAT || !process.env.AIRTABLE_BASE_ID || !process.env.AIRTABLE_TABLE_ID) {
