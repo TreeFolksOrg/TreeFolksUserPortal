@@ -21,12 +21,17 @@ const corsOptions = {
         const allowedOrigins = [
             'http://localhost:5173',
             'http://localhost:3000',
-            'https://tree-folks-user-portal-frontend.vercel.app'
+            // Vercel deployments (legacy)
+            'https://tree-folks-user-portal-frontend.vercel.app',
+            // Heroku deployment
+            'https://tf-reforestation-0e95d424312a.herokuapp.com',
+            // Custom domain
+            'https://reforestation.treefolks.org'
         ];
         // Allow requests with no origin (same-origin requests, mobile apps, curl)
         if (!origin) return callback(null, true);
         // In production combined deployment, allow same-origin
-        if (process.env.HEROKU_APP_NAME) return callback(null, true);
+        if (process.env.NODE_ENV === 'production') return callback(null, true);
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
