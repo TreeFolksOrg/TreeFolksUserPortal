@@ -19,7 +19,8 @@ const firebaseConfig = {
 };
 
 const ADMIN_UIDS = new Set([
-  "y50ryIOmhUO9lWTyQz02422Fjh42"
+  "y50ryIOmhUO9lWTyQz02422Fjh42",
+  "LIR3Dtx4dbRhMKdjE2fM7SKw8BX2"
 ]);
 
 const app = initializeApp(firebaseConfig);
