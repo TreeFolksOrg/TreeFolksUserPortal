@@ -171,10 +171,8 @@ const handleGetLandownerProjects = asyncHandler(async (req, res) => {
     const { email } = req.user;
     try {
         const projects = await airtableService.findAllProjectsByEmail(email);
-        if (!projects || projects.length === 0) {
-            return res.status(404).json({ message: "No projects found for this email." });
-        }
-        res.json(projects);
+        // Return empty array with 200 if no projects found (not 404)
+        res.json(projects || []);
     } catch (error) {
         console.error(`Error fetching projects for email ${email}:`, error);
         res.status(500).json({ message: "Failed to fetch landowner projects." });
