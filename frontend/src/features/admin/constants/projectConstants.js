@@ -75,31 +75,28 @@ export const DOCUMENT_SLOTS = [
  */
 export const TIMELINE_PHASES = [
   {
-    title: "June — August",
+    title: "January — August",
     points: [
       "On-site consultations with TreeFolks' experts & create draft maps",
       'Establish "Grow Zones" in planting areas',
       "Fence out livestock from grow zones",
+      "Flag off planting areas & finalize maps"
     ],
   },
   {
-    title: "September — November",
-    points: [
-      "Ideal time for seeding wildflowers & native grasses",
-      "Mark planting areas & finalize maps",
-    ],
-  },
-  {
-    title: "December — February",
+    title: "October — January",
     points: [
       "Trees are planted by contractors or volunteers",
+      "Pick up Groasis boxes",
+      "Ideal time for seeding wildflowers & naive grasses",
+      "Drop off Groasis boxes"
     ],
   },
   {
-    title: "March — May",
+    title: "January — May",
     points: [
-      "Carbon+ Credit docs filed w/ county clerks",
-      "Landowners submit photo points annually",
+      "Carbon+ Credit docs filed w/ county clerks (if applicable)",
+      "Landowners submit photo points annually (Optional)",
     ],
   },
 ];
