@@ -254,13 +254,17 @@ const getProjectsBySeason = async (season) => {
         const projects = [];
         // Select fields needed for list view - update based on your FIELD_MAP.airtableToApi
         const fieldsToSelect = Object.keys(FIELD_MAP.airtableToApi); // Select all mapped fields for simplicity or curate as before
+        const normalizedSeason = String(season || '').trim();
+        const escapedSeason = escapeFormulaValue(normalizedSeason.toLowerCase());
+        const seasonFilterFormula = `LOWER(TRIM({${SEASON_FIELD_NAME}} & "")) = "${escapedSeason}"`;
 
-        console.log(`Fetching projects for season: ${season}`); // Removed long fields list log
+        console.log(`Fetching projects for season: ${normalizedSeason}`); // Removed long fields list log
+        console.log(`Using season filter formula: ${seasonFilterFormula}`);
 
         table.select({
             // maxRecords: 100, // Consider pagination for large bases
-            view: "All status and property notes", // Optional: Use a specific view if pre-filtered/sorted
-            filterByFormula: `{Season} = '${season}'`, // Ensure 'Season' is the correct field name
+            // Intentionally do not set view so records hidden by a specific Airtable view are still returned.
+            filterByFormula: seasonFilterFormula,
             fields: fieldsToSelect // Only fetch necessary fields
         }).eachPage(
             (records, fetchNextPage) => {
@@ -273,9 +277,9 @@ const getProjectsBySeason = async (season) => {
             (err) => {
                 if (err) {
                     console.error('Error fetching projects by season:', err);
-                    return reject(new Error(`Failed to fetch projects for season ${season}: ${err.message}`));
+                    return reject(new Error(`Failed to fetch projects for season ${normalizedSeason}: ${err.message}`));
                 }
-                console.log(`Found ${projects.length} projects for season ${season}`);
+                console.log(`Found ${projects.length} projects for season ${normalizedSeason}`);
                 resolve(projects); // Resolve the promise when done
             }
         );
