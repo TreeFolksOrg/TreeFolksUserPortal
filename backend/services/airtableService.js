@@ -784,7 +784,11 @@ const deleteSeasonOption = async (seasonName) => {
 };
 
 const attachDocumentToProject = async (recordId, documentType, attachment) => {
+    console.log(`[attachDocumentToProject] Starting upload - RecordID: ${recordId}, DocumentType: ${documentType}`);
+    
     const fieldName = await resolveAttachmentFieldName(documentType);
+    console.log(`[attachDocumentToProject] Resolved field name: ${fieldName}`);
+    
     const apiKeyForField = FIELD_MAP.airtableToApi[fieldName] || documentType;
     if (!attachment?.url) {
         throw createServiceError('Attachment URL is required.', 400);
@@ -805,17 +809,24 @@ const attachDocumentToProject = async (recordId, documentType, attachment) => {
             documentType === 'finalMap' || // Allow multiple Final Maps
             documentType === 'draftMap'; // Enable versioning for Draft Map PDFs
 
+        console.log(`[attachDocumentToProject] Should append: ${shouldAppend}`);
+
         let existingAttachments = [];
         if (shouldAppend) {
             try {
+                console.log(`[attachDocumentToProject] Fetching current record to get existing attachments...`);
                 const currentRecord = await table.find(recordId);
                 const currentFieldValue = currentRecord?.get(fieldName);
+                console.log(`[attachDocumentToProject] Current field value type: ${Array.isArray(currentFieldValue) ? 'Array' : typeof currentFieldValue}, length: ${currentFieldValue?.length}`);
+                
                 if (Array.isArray(currentFieldValue)) {
                     existingAttachments = currentFieldValue
                         .filter(att => att?.id)
                         .map(att => ({ id: att.id }));
+                    console.log(`[attachDocumentToProject] Found ${existingAttachments.length} existing attachments`);
                 }
             } catch (lookupError) {
+                console.error(`[attachDocumentToProject] Error fetching existing attachments:`, lookupError);
                 throw createServiceError(
                     lookupError?.message || `Failed to read existing attachments for '${fieldName}'.`,
                     lookupError?.statusCode || 500
@@ -838,6 +849,13 @@ const attachDocumentToProject = async (recordId, documentType, attachment) => {
                 },
             ];
 
+        console.log(`[attachDocumentToProject] Attachment payload:`, {
+            fieldName,
+            existingCount: existingAttachments.length,
+            totalCount: attachmentPayload.length,
+            newAttachment: { url: attachment.url, filename: attachment.filename }
+        });
+
         const updatePayload = [{
             id: recordId,
             fields: {
@@ -845,11 +863,13 @@ const attachDocumentToProject = async (recordId, documentType, attachment) => {
             },
         }];
 
+        console.log(`[attachDocumentToProject] Updating Airtable record...`);
         const updatedRecords = await table.update(updatePayload, { typecast: true });
         if (!updatedRecords || updatedRecords.length === 0) {
             throw new Error('Record update failed, no record returned.');
         }
         const updatedRecord = updatedRecords[0];
+        console.log(`[attachDocumentToProject] Airtable update successful`);
 
         // For single-file fields, wait briefly for Airtable to host the attachment and return the CDN URL.
         if (!shouldAppend) {

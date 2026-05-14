@@ -223,7 +223,8 @@ const handleUploadProjectDocument = asyncHandler(async (req, res) => {
         try {
             // Need current project state to calculate version
             const currentProject = await airtableService.getProjectDetails(recordId);
-            const ownerName = currentProject.ownerLastName || currentProject.siteName || 'Project';
+            // ownerDisplayName maps to "Owner Last Name or Site Name" field
+            const ownerName = currentProject.ownerDisplayName || currentProject.ownerFirstName || 'Project';
             const safeOwnerName = ownerName.replace(/[^a-zA-Z0-9]/g, '');
             
             const existingAttachments = currentProject.draftMapUrl || [];
@@ -252,11 +253,15 @@ const handleUploadProjectDocument = asyncHandler(async (req, res) => {
     let cloudinaryAsset = null;
 
     try {
+        console.log(`[Upload] Starting upload for record ${recordId}, documentType: ${documentType}`);
         const buffer = Buffer.from(data, 'base64');
+        console.log(`[Upload] Buffer size: ${buffer.length} bytes`);
+        
         // Check if file is PDF based on detected type or extension
         const isPdf = cleanedContentType === 'application/pdf' || (filename && filename.toLowerCase().endsWith('.pdf'));
         const resourceType = isPdf ? 'raw' : 'auto';
 
+        console.log(`[Upload] Uploading to Cloudinary - filename: ${safeName}, resource_type: ${resourceType}`);
         cloudinaryAsset = await cloudinaryService.uploadBuffer(buffer, {
             folder: 'project-uploads',
             filename: safeName,
@@ -265,7 +270,9 @@ const handleUploadProjectDocument = asyncHandler(async (req, res) => {
 
         // Use public secureUrl directly (Security settings now allow PDF delivery)
         const attachmentUrl = cloudinaryAsset.secureUrl;
+        console.log(`[Upload] Cloudinary upload successful - URL: ${attachmentUrl}`);
 
+        console.log(`[Upload] Attaching to Airtable record...`);
         const {
             project: updatedProject,
             apiKey: projectFieldKey,
@@ -276,6 +283,8 @@ const handleUploadProjectDocument = asyncHandler(async (req, res) => {
             filename: finalFilename || safeName, // Use the versioned name here
             contentType: cleanedContentType,
         });
+
+        console.log(`[Upload] Airtable attachment successful, hosted: ${hosted}`);
 
         const resolvedFieldKey = projectFieldKey || documentType;
         const projectFieldValue = updatedProject?.[resolvedFieldKey];
