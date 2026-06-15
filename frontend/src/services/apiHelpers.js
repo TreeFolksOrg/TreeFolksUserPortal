@@ -116,6 +116,7 @@ export const normalizeProjectRecord = (record = {}, { seasonYear } = {}) => {
     ownerDisplayName: record.ownerDisplayName ?? '',
     phone: record.phone ?? record.contact?.phone ?? '',
     email: record.email ?? record.contact?.email ?? '',
+    secondaryEmails: record.secondaryEmails ?? '',
     applicationDate: record.applicationDate ?? '',
     consultationDate: record.consultationDate ?? '',
     flaggingDate: record.flaggingDate ?? '',

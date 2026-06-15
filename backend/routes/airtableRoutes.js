@@ -53,6 +53,9 @@ router.get('/projects/my-project', airtableController.handleGetLandownerProject)
 // GET ALL projects associated with the logged-in landowner (supports multiple projects per email)
 router.get('/projects/my-projects', airtableController.handleGetLandownerProjects);
 
+// PATCH update secondary emails for a project (landowners can update their own projects, admins can update any)
+router.patch('/projects/:recordId/secondary-emails', airtableController.handleUpdateSecondaryEmails);
+
 // POST a comment to the draft map - Landowner interaction
 // COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
 // router.post('/projects/:recordId/draft-map/comments', airtableController.handleAddDraftMapComment);

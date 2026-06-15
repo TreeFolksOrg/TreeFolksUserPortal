@@ -227,6 +227,11 @@ const ProjectDetail = () => {
         : undefined,
     },
     {
+      label: "Secondary Emails",
+      value: ensureText(project.secondaryEmails, "None"),
+      placeholder: "None",
+    },
+    {
       label: "Phone",
       value: ensureText(primaryContactPhone, "Not provided"),
       href: sanitizedPhoneHref,

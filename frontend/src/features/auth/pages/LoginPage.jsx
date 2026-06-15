@@ -16,6 +16,7 @@ import { useAuth } from "../AuthProvider";
 const initialSignupState = {
   username: "",
   email: "",
+  secondaryEmails: "",
   password: "",
   confirmPassword: "",
 };
@@ -111,6 +112,7 @@ const LoginPage = () => {
             signupValues.username.trim() ||
             signupValues.email.split("@")[0],
           email: signupValues.email.trim(),
+          secondaryEmails: signupValues.secondaryEmails.trim(),
           isAdmin: false,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -220,6 +222,22 @@ const LoginPage = () => {
                 onChange={handleSignupChange}
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
               />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Secondary Emails <span className="text-gray-500 font-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                name="secondaryEmails"
+                placeholder="email1@example.com, email2@example.com"
+                value={signupValues.secondaryEmails}
+                onChange={handleSignupChange}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Add additional email addresses (comma-separated) that should have access to your project(s)
+              </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div>

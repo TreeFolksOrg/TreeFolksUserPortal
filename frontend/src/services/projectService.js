@@ -269,3 +269,36 @@ export const deleteProject = async (projectId) => {
 //     );
 //   }
 // };
+
+/**
+ * Update secondary emails for a project.
+ * Landowners can update their own projects, admins can update any project.
+ * 
+ * @param {string} projectId - The project ID
+ * @param {string} secondaryEmails - Comma-separated email addresses
+ * @returns {Promise<object>} Updated project record
+ */
+export const updateSecondaryEmails = async (projectId, secondaryEmails) => {
+  try {
+    const response = await apiClient.patch(
+      `/projects/${encodeURIComponent(projectId)}/secondary-emails`,
+      { secondaryEmails }
+    );
+    
+    if (!response?.data?.success) {
+      throw new Error(response?.data?.message || 'Failed to update secondary emails');
+    }
+    
+    // Clear cache to ensure fresh data on next fetch
+    resetSeasonProjectsCache();
+    
+    return normalizeProjectRecord(response.data.project);
+  } catch (error) {
+    console.error(`API Call: updateSecondaryEmails(${projectId}) -> Failed.`, error);
+    throw new Error(
+      error?.response?.data?.message ||
+      error?.message ||
+      'Failed to update secondary emails.'
+    );
+  }
+};

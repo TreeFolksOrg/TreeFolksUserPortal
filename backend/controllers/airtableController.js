@@ -541,6 +541,52 @@ const handleDeleteProjectDocumentAtIndex = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * Allow landowners to update secondary emails for their own project(s)
+ */
+const handleUpdateSecondaryEmails = asyncHandler(async (req, res) => {
+    const { recordId } = req.params;
+    const { secondaryEmails } = req.body;
+
+    // Permission Check - only allow landowners to update their own projects
+    if (!req.user || !req.user.email) {
+        return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    // Admins can update any project's secondary emails
+    if (!req.user.admin) {
+        // Landowners can only update their own projects
+        const landownerProjects = await airtableService.findAllProjectsByEmail(req.user.email);
+        const hasAccess = landownerProjects.some(project => project.id === recordId);
+        
+        if (!hasAccess) {
+            return res.status(403).json({ message: "Access denied to this project." });
+        }
+    }
+
+    // Validate secondaryEmails format (should be comma-separated emails or empty string)
+    if (secondaryEmails !== undefined && typeof secondaryEmails !== 'string') {
+        return res.status(400).json({ message: "Secondary emails must be a string." });
+    }
+
+    try {
+        const updatedProject = await airtableService.updateProject(recordId, {
+            secondaryEmails: secondaryEmails || ''
+        });
+        
+        res.json({
+            success: true,
+            project: updatedProject
+        });
+    } catch (error) {
+        console.error(`Error updating secondary emails for ${recordId}:`, error);
+        if (error.message.includes('Record not found')) {
+            return res.status(404).json({ message: 'Project not found.' });
+        }
+        res.status(500).json({ message: "Failed to update secondary emails." });
+    }
+});
+
 module.exports = {
     handleGetAllSeasons,
     handleGetProjectsBySeason,
@@ -555,5 +601,6 @@ module.exports = {
     handleDeleteProjectDocumentAtIndex,
     handleGetLandownerProject,
     handleGetLandownerProjects,
+    handleUpdateSecondaryEmails,
     // handleAddDraftMapComment, // COMMENTED OUT - Draft Map Comments field doesn't exist
 };

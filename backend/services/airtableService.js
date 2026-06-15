@@ -65,6 +65,7 @@ const FIELD_DEFINITIONS = [
     { api: 'address', airtable: 'Property Address' },
     { api: 'phone', airtable: '☎️-Primary Phone Number' },
     { api: 'email', airtable: '📩-Email' },
+    { api: 'secondaryEmails', airtable: 'Secondary Email' },
     { api: 'city', airtable: '📍-City' },
     { api: 'zipCode', airtable: '📍-Zip Code' },
     { api: 'county', airtable: '📍-County' },
@@ -319,8 +320,14 @@ const findProjectByEmail = async (email) => {
 
     // Escape email for Airtable formula to prevent injection/formula breakage
     const emailField = FIELD_MAP.apiToAirtable.email || 'Email';
+    const secondaryEmailField = FIELD_MAP.apiToAirtable.secondaryEmails || 'Secondary Email';
     const escapedEmail = escapeFormulaValue(normalizedEmail);
-    const filterFormula = `LOWER({${emailField}}) = "${escapedEmail}"`;
+    
+    // Check both primary email and secondary emails (comma-separated)
+    const filterFormula = `OR(
+        LOWER({${emailField}}) = "${escapedEmail}",
+        FIND("${escapedEmail}", LOWER({${secondaryEmailField}}))
+    )`;
 
     console.log(`Using filter formula: ${filterFormula}`);
 
@@ -338,10 +345,18 @@ const findProjectByEmail = async (email) => {
         const foundRecord = processRecord(records[0]);
 
         // CRITICAL: Post-fetch verification to prevent data leaks
-        // Double-check that the returned record's email actually matches
+        // Check if the email matches either primary or any secondary email
         const recordEmail = (foundRecord.email || '').toLowerCase().trim();
-        if (recordEmail !== normalizedEmail) {
-            console.error(`DATA LEAK PREVENTED: Requested email '${normalizedEmail}' but Airtable returned record with email '${recordEmail}'. Record ID: ${foundRecord.id}`);
+        const secondaryEmails = (foundRecord.secondaryEmails || '')
+            .toLowerCase()
+            .split(',')
+            .map(e => e.trim())
+            .filter(Boolean);
+        
+        const hasAccess = recordEmail === normalizedEmail || secondaryEmails.includes(normalizedEmail);
+        
+        if (!hasAccess) {
+            console.error(`DATA LEAK PREVENTED: Requested email '${normalizedEmail}' but record doesn't have matching primary or secondary email. Record ID: ${foundRecord.id}`);
             return null;
         }
 
@@ -365,8 +380,14 @@ const findAllProjectsByEmail = async (email) => {
     console.log(`Searching for ALL projects with email: ${normalizedEmail}`);
 
     const emailField = FIELD_MAP.apiToAirtable.email || 'Email';
+    const secondaryEmailField = FIELD_MAP.apiToAirtable.secondaryEmails || 'Secondary Email';
     const escapedEmail = escapeFormulaValue(normalizedEmail);
-    const filterFormula = `LOWER({${emailField}}) = "${escapedEmail}"`;
+    
+    // Check both primary email and secondary emails (comma-separated)
+    const filterFormula = `OR(
+        LOWER({${emailField}}) = "${escapedEmail}",
+        FIND("${escapedEmail}", LOWER({${secondaryEmailField}}))
+    )`;
 
     console.log(`Using filter formula: ${filterFormula}`);
 
@@ -381,9 +402,17 @@ const findAllProjectsByEmail = async (email) => {
                 (records, fetchNextPage) => {
                     records.forEach((record) => {
                         const processed = processRecord(record);
-                        // Verify email matches to prevent data leaks
+                        // Verify email matches primary or any secondary email to prevent data leaks
                         const recordEmail = (processed.email || '').toLowerCase().trim();
-                        if (recordEmail === normalizedEmail) {
+                        const secondaryEmails = (processed.secondaryEmails || '')
+                            .toLowerCase()
+                            .split(',')
+                            .map(e => e.trim())
+                            .filter(Boolean);
+                        
+                        const hasAccess = recordEmail === normalizedEmail || secondaryEmails.includes(normalizedEmail);
+                        
+                        if (hasAccess) {
                             allRecords.push(processed);
                         } else {
                             console.warn(`DATA LEAK PREVENTED: Skipping record ${processed.id} with mismatched email`);

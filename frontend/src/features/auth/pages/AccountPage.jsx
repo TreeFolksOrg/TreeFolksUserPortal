@@ -3,6 +3,8 @@ import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useAuth } from "../AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { getLandownerProjects } from "../../../services/landownerService";
+import { updateSecondaryEmails as updateProjectSecondaryEmails } from "../../../services/projectService";
 
 /**
  * AccountPage - User account management page
@@ -18,13 +20,15 @@ const AccountPage = () => {
   const { user, profile, isAdmin, signOut, updateProfileState } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState(profile?.username ?? "");
+  const [secondaryEmails, setSecondaryEmails] = useState(profile?.secondaryEmails ?? "");
   const [statusMessage, setStatusMessage] = useState("");
   const [statusType, setStatusType] = useState("info");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setUsername(profile?.username ?? "");
-  }, [profile?.username]);
+    setSecondaryEmails(profile?.secondaryEmails ?? "");
+  }, [profile?.username, profile?.secondaryEmails]);
 
   if (!user) {
     return null;
@@ -38,14 +42,32 @@ const AccountPage = () => {
       return;
     }
 
-    setSaving(true);
-    try {
+    se// Update Firebase user profile
       await updateDoc(doc(db, "users", user.uid), {
         username: username.trim(),
+        secondaryEmails: secondaryEmails.trim(),
         updatedAt: serverTimestamp(),
       });
+      
       // Update local state immediately so sidebar reflects changes
-      updateProfileState({ username: username.trim() });
+      updateProfileState({ 
+        username: username.trim(),
+        secondaryEmails: secondaryEmails.trim()
+      });
+
+      // Sync secondary emails to Airtable projects
+      try {
+        const projects = await getLandownerProjects();
+        const updatePromises = projects.map(project => 
+          updateProjectSecondaryEmails(project.id, secondaryEmails.trim())
+        );
+        await Promise.all(updatePromises);
+      } catch (airtableError) {
+        console.warn("Failed to sync secondary emails to Airtable:", airtableError);
+        // Don't fail the whole update if Airtable sync fails
+      }sername: username.trim(),
+        secondaryEmails: secondaryEmails.trim()
+      });
       
       setStatusMessage("Profile updated successfully.");
       setStatusType("success");
@@ -104,6 +126,21 @@ const AccountPage = () => {
               disabled
               className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-500"
             />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Secondary Emails <span className="text-gray-500 font-normal">(optional)</span>
+            </label>
+            <input
+              type="text"
+              placeholder="email1@example.com, email2@example.com"
+              value={secondaryEmails}
+              onChange={(event) => setSecondaryEmails(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Additional email addresses (comma-separated) that can access your project(s)
+            </p>
           </div>
           <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
             <p className="text-sm font-semibold text-gray-700">Role</p>
