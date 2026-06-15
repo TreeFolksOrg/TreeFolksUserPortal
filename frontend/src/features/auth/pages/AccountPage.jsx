@@ -42,7 +42,9 @@ const AccountPage = () => {
       return;
     }
 
-    se// Update Firebase user profile
+    setSaving(true);
+    try {
+      // Update Firebase user profile
       await updateDoc(doc(db, "users", user.uid), {
         username: username.trim(),
         secondaryEmails: secondaryEmails.trim(),
@@ -65,9 +67,7 @@ const AccountPage = () => {
       } catch (airtableError) {
         console.warn("Failed to sync secondary emails to Airtable:", airtableError);
         // Don't fail the whole update if Airtable sync fails
-      }sername: username.trim(),
-        secondaryEmails: secondaryEmails.trim()
-      });
+      }
       
       setStatusMessage("Profile updated successfully.");
       setStatusType("success");
