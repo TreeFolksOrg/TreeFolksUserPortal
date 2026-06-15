@@ -55,7 +55,6 @@ const resolveAttachmentFieldName = async (documentType) => {
     return preferred;
 };
 
-// --- Field Mappings (Keep as is, used by other functions) ---
 // --- Field Mappings ---
 // Single Source of Truth for Field Configuration
 const FIELD_DEFINITIONS = [
@@ -64,52 +63,52 @@ const FIELD_DEFINITIONS = [
     { api: 'ownerFirstName', airtable: 'Owner First Name or Organization' },
     { api: 'ownerDisplayName', airtable: 'Owner Last Name or Site Name' },
     { api: 'address', airtable: 'Property Address' },
-    { api: 'phone', airtable: 'Primary Phone Number' },
-    { api: 'email', airtable: 'Email' },
-    { api: 'city', airtable: 'City' },
-    { api: 'zipCode', airtable: 'Zip Code' },
-    { api: 'county', airtable: 'County' },
+    { api: 'phone', airtable: '☎️-Primary Phone Number' },
+    { api: 'email', airtable: '📩-Email' },
+    { api: 'city', airtable: '📍-City' },
+    { api: 'zipCode', airtable: '📍-Zip Code' },
+    { api: 'county', airtable: '📍-County' },
 
     // Project Details
-    { api: 'season', airtable: 'Season' },
-    { api: 'status', airtable: 'Current Status' },
-    { api: 'landRegion', airtable: 'Land Region' },
+    { api: 'season', airtable: '⭐-Season' },
+    { api: 'status', airtable: '⭐-Current Status' },
+    { api: 'landRegion', airtable: 'Ecoregion' },
     { api: 'propertyId', airtable: 'Property ID Number(s)' },
-    { api: 'siteNumber', airtable: 'Site Number' },
+    { api: 'siteNumber', airtable: '⭐-Site #' },
 
     // Dates
-    { api: 'Initial Contact Date', airtable: 'Initial Contact Date' },
-    { api: 'consultationDate', airtable: 'Consultation Date' },
-    { api: 'flaggingDate', airtable: 'Flagging Date' },
-    { api: 'plantingDate', airtable: 'Planting Date' },
-    { api: 'applicationDate', airtable: 'Application Date' },
+    { api: 'Initial Contact Date', airtable: '📅- Initial Contact Date' },
+    { api: 'consultationDate', airtable: '📅 - Consult Date' },
+    { api: 'flaggingDate', airtable: '📅 - Flagging Date' },
+    { api: 'plantingDate', airtable: '📅 - Planting Date' },
+    { api: 'applicationDate', airtable: '📅 - Application Date' },
 
     // Metrics
-    { api: 'wetlandAcres', airtable: 'Wetland Acres' },
-    { api: 'uplandAcres', airtable: 'Upland Acres' },
-    { api: 'totalAcres', airtable: 'Total Acres' },
-    { api: 'wetlandTrees', airtable: 'Wetland Trees' },
-    { api: 'uplandTrees', airtable: 'Upland Trees' },
-    { api: 'totalTrees', airtable: 'Total Trees' },
-    { api: 'quizScorePreConsultation', airtable: 'Quiz Score - Pre-consult' },
-    { api: 'quizScorePostPlanting', airtable: 'Quiz Score - Post-planting' },
-    { api: 'participationStatus', airtable: 'Participation status' },
+    { api: 'wetlandAcres', airtable: '🌄-WET Acres' },
+    { api: 'uplandAcres', airtable: '🌄-UPL Acres' },
+    { api: 'totalAcres', airtable: '🌄-TOTAL Acres' },
+    { api: 'wetlandTrees', airtable: '🌳-WET Trees' },
+    { api: 'uplandTrees', airtable: '🌳-UPL Trees' },
+    { api: 'totalTrees', airtable: '🌳-TOTAL Trees' },
+    { api: 'quizScorePreConsultation', airtable: '📝-Quiz-Pre-consult' },
+    { api: 'quizScorePostPlanting', airtable: '📝-Quiz-Post-Planting' },
+    { api: 'participationStatus', airtable: '⭐-Overview Status' },
 
     // Maps & Documents (Using Url suffix to match Read logic and Attachment handling)
-    { api: 'initialMapUrl', airtable: 'Initial Map' },
-    { api: 'draftMapUrl', airtable: 'Draft Map' },
-    { api: 'finalMapUrl', airtable: 'Final Map' },
-    { api: 'replantingMapUrl', airtable: 'Replanting Map' },
+    { api: 'initialMapUrl', airtable: '🗺️-Initial Map' },
+    { api: 'draftMapUrl', airtable: '🗺️-Draft Map' },
+    { api: 'finalMapUrl', airtable: '🗺️-Final Map' },
+    { api: 'replantingMapUrl', airtable: '🗺️-Replant Map' },
 
     // Attachments / Collections
-    { api: 'otherAttachments', airtable: 'Other Attachments' },
+    { api: 'otherAttachments', airtable: '📃-Additional Documents' },
     { api: 'activeCarbonShapefiles', airtable: 'Active Carbon Shapefiles' },
-    { api: 'plantingPhotoUrls', airtable: 'Planting Photos' },
-    { api: 'beforePhotoUrls', airtable: 'Before Photos' },
-    { api: 'propertyImageUrls', airtable: 'Landowner Photo Submissions' },
-    { api: 'carbonDocs', airtable: 'Carbon docs (notarized)' },
-    { api: 'postPlantingReports', airtable: 'Post-Planting Reports' },
-    { api: 'draftMapComments', airtable: 'Draft Map Comments' },
+    { api: 'plantingPhotoUrls', airtable: '📷-Planting Photos' },
+    { api: 'beforePhotoUrls', airtable: '📷-Baseline Photos' },
+    { api: 'propertyImageUrls', airtable: '📷-Landowner Photos' },
+    { api: 'carbonDocs', airtable: '📃-Carbon Docs' },
+    { api: 'postPlantingReports', airtable: '📃-Post-Planting Reports' },
+    // { api: 'draftMapComments', airtable: 'Draft Map Comments' }, // Field not found in current Airtable schema
 ];
 
 const buildFieldMaps = () => {
@@ -131,15 +130,15 @@ const FIELD_MAP = buildFieldMaps();
 
 const DOCUMENT_FIELD_MAP = {
     carbonDocs: FIELD_MAP.apiToAirtable.carbonDocs || 'Carbon docs (notarized)',
-    draftMap: FIELD_MAP.apiToAirtable.draftMap || 'Draft Map',
-    finalMap: FIELD_MAP.apiToAirtable.finalMap || 'Final Map',
-    replantingMap: FIELD_MAP.apiToAirtable.replantingMap || 'Replanting Map',
-    otherAttachments: FIELD_MAP.apiToAirtable.otherAttachments || 'Other Attachments',
-    postPlantingReports: FIELD_MAP.apiToAirtable.postPlantingReports || 'Post-Planting Reports',
-    plantingPhotoUrls: FIELD_MAP.apiToAirtable.plantingPhotoUrls || 'Planting Photos',
-    beforePhotoUrls: FIELD_MAP.apiToAirtable.beforePhotoUrls || 'Before Photos',
-    propertyImageUrls: FIELD_MAP.apiToAirtable.propertyImageUrls || 'Landowner Photo Submissions',
-    activeCarbonShapefiles: FIELD_MAP.apiToAirtable.activeCarbonShapefiles || 'Active Carbon Shapefiles',
+    draftMap: FIELD_MAP.apiToAirtable.draftMap || 'Draf📃-Carbon Docs',
+    draftMap: FIELD_MAP.apiToAirtable.draftMap || '🗺️-Draft Map',
+    finalMap: FIELD_MAP.apiToAirtable.finalMap || '🗺️-Final Map',
+    replantingMap: FIELD_MAP.apiToAirtable.replantingMap || '🗺️-Replant Map',
+    otherAttachments: FIELD_MAP.apiToAirtable.otherAttachments || '📃-Additional Documents',
+    postPlantingReports: FIELD_MAP.apiToAirtable.postPlantingReports || '📃-Post-Planting Reports',
+    plantingPhotoUrls: FIELD_MAP.apiToAirtable.plantingPhotoUrls || '📷-Planting Photos',
+    beforePhotoUrls: FIELD_MAP.apiToAirtable.beforePhotoUrls || '📷-Baseline Photos',
+    propertyImageUrls: FIELD_MAP.apiToAirtable.propertyImageUrls || '📷-Landowner Photoapefiles',
 };
 
 // --- Helper Function to Process Records (Keep as is) ---
@@ -190,7 +189,7 @@ const processRecord = (record) => {
 };
 
 
-const SEASON_FIELD_NAME = FIELD_MAP.apiToAirtable.season || 'Season';
+const SEASON_FIELD_NAME = FIELD_MAP.apiToAirtable.season || '⭐-Season';
 
 const createServiceError = (message, statusCode = 500) => {
     const error = new Error(message);

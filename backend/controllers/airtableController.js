@@ -350,64 +350,65 @@ const handleDeleteProjectDocument = asyncHandler(async (req, res) => {
     }
 });
 
-const handleAddDraftMapComment = asyncHandler(async (req, res) => {
-    const { recordId } = req.params;
-    const { comment } = req.body;
+// COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
+// const handleAddDraftMapComment = asyncHandler(async (req, res) => {
+//     const { recordId } = req.params;
+//     const { comment } = req.body;
 
-    // --- Permission Check ---
-    // User requested: "I want only the landwoner to be able to send comments to the admin."
-    // Admin should view but NOT send.
-    if (req.user && req.user.admin) {
-        return res.status(403).json({ message: "Admins cannot post comments here." });
-    }
+//     // --- Permission Check ---
+//     // User requested: "I want only the landwoner to be able to send comments to the admin."
+//     // Admin should view but NOT send.
+//     if (req.user && req.user.admin) {
+//         return res.status(403).json({ message: "Admins cannot post comments here." });
+//     }
     
-    // Landowner check:
-    if (!req.user || !req.user.email) {
-        return res.status(401).json({ message: "Unauthorized." });
-    }
+//     // Landowner check:
+//     if (!req.user || !req.user.email) {
+//         return res.status(401).json({ message: "Unauthorized." });
+//     }
     
-    // Use findAllProjectsByEmail to support landowners with multiple projects
-    const landownerProjects = await airtableService.findAllProjectsByEmail(req.user.email);
-    const hasAccess = landownerProjects.some(project => project.id === recordId);
-    if (!hasAccess) {
-        return res.status(403).json({ message: "Access denied to this project." });
-    }
-    // --- End Permission Check ---
+//     // Use findAllProjectsByEmail to support landowners with multiple projects
+//     const landownerProjects = await airtableService.findAllProjectsByEmail(req.user.email);
+//     const hasAccess = landownerProjects.some(project => project.id === recordId);
+//     if (!hasAccess) {
+//         return res.status(403).json({ message: "Access denied to this project." });
+//     }
+//     // --- End Permission Check ---
 
-    if (!comment || typeof comment !== 'string' || comment.trim() === '') {
-        return res.status(400).json({ message: "Comment is required." });
-    }
+//     if (!comment || typeof comment !== 'string' || comment.trim() === '') {
+//         return res.status(400).json({ message: "Comment is required." });
+//     }
 
-    try {
-        // 1. Fetch current project to get existing comments
-        const currentProject = await airtableService.getProjectDetails(recordId);
-        const existingComments = currentProject.draftMapComments || "";
+//     try {
+//         // 1. Fetch current project to get existing comments
+//         const currentProject = await airtableService.getProjectDetails(recordId);
+//         const existingComments = currentProject.draftMapComments || "";
 
-        // 2. Format new comment entry
-        const dateStr = new Date().toLocaleString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true
-        });
-        const newEntry = `[${dateStr}] ${comment.trim()}\n\n`;
+//         // 2. Format new comment entry
+//         const dateStr = new Date().toLocaleString('en-US', {
+//             month: 'short', day: 'numeric', year: 'numeric',
+//             hour: 'numeric', minute: '2-digit', hour12: true
+//         });
+//         const newEntry = `[${dateStr}] ${comment.trim()}\n\n`;
 
-        // 3. Prepend to existing text
-        const updatedComments = newEntry + existingComments;
+//         // 3. Prepend to existing text
+//         const updatedComments = newEntry + existingComments;
 
-        // 4. Update Airtable
-        const updatedProject = await airtableService.updateProject(recordId, {
-            draftMapComments: updatedComments
-        });
+//         // 4. Update Airtable
+//         const updatedProject = await airtableService.updateProject(recordId, {
+//             draftMapComments: updatedComments
+//         });
 
-        res.json({
-            success: true,
-            project: updatedProject
-        });
+//         res.json({
+//             success: true,
+//             project: updatedProject
+//         });
 
-    } catch (error) {
-        console.error(`Error adding draft map comment for ${recordId}:`, error);
-        res.status(500).json({ message: "Failed to add comment." });
-    }
-});
+//     } catch (error) {
+//         console.error(`Error adding draft map comment for ${recordId}:`, error);
+//         res.status(500).json({ message: "Failed to add comment." });
+//     }
+// });
 
 /**
  * Handles replacing a specific document at an index within a multi-file slot.
@@ -554,5 +555,5 @@ module.exports = {
     handleDeleteProjectDocumentAtIndex,
     handleGetLandownerProject,
     handleGetLandownerProjects,
-    handleAddDraftMapComment,
+    // handleAddDraftMapComment, // COMMENTED OUT - Draft Map Comments field doesn't exist
 };

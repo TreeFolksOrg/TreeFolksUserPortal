@@ -133,7 +133,7 @@ export const normalizeProjectRecord = (record = {}, { seasonYear } = {}) => {
     uplandTrees: record.uplandTrees ?? "",
     totalTrees: record.totalTrees ?? "",
     status: record.status ?? 'Unknown',
-    draftMapComments: record.draftMapComments ?? "",
+    // draftMapComments: record.draftMapComments ?? "", // COMMENTED OUT - Field doesn't exist in Airtable
     documents: documentLinks,
     raw: record.raw ?? record,
   };

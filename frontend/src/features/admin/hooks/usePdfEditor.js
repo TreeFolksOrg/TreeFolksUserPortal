@@ -87,7 +87,7 @@ export const usePdfEditor = (projectId, project, handleDocumentUpload, loadProje
       
       // 2. If upload succeeds, add the comment (only for draftMaps)
       if (pdfEditorState.documentType === 'draftMap' && comment && comment.trim()) {
-         await apiService.addDraftMapComment(projectId, comment);
+         // await apiService.addDraftMapComment(projectId, comment); // COMMENTED OUT - Field doesn't exist
       }
       
       // 3. Single refresh at the end after both operations complete

@@ -373,11 +373,10 @@ const DocumentTile = ({
         )}
       </div>
 
-      {/* Draft Map Comments Section */}
+      {/* COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
       {slot.key === 'draftMap' && (
 
         <div className="mt-4 border-t border-gray-100 pt-3">
-          {/* Shared View: Show ONLY the last comment for both Admins and Landowners */}
           {parsedComments.length > 0 && (
             <div className="rounded-md bg-yellow-50 p-3 mb-3">
               <p className="text-xs font-semibold text-yellow-800 mb-2">
@@ -397,7 +396,6 @@ const DocumentTile = ({
             </div>
           )}
 
-          {/* Landowner View: Add Button only */}
           {!isAdmin && files.length > 0 && (
             <div className="space-y-3">
               <button
@@ -411,6 +409,7 @@ const DocumentTile = ({
           )} 
         </div>
       )}
+      */}
     </div>
   );
 };

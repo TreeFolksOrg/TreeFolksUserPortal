@@ -18,7 +18,8 @@ import DateSelectionModal from "../../../components/common/DateSelectionModal";
 // ==================== Feature Components ====================
 import PdfEditor from "../components/PdfEditor";
 import DocumentTile from "../components/DocumentTile";
-import DraftMapCommentModal from "../components/DraftMapCommentModal";
+// COMMENTED OUT - Draft Map Comments field doesn't exist
+// import DraftMapCommentModal from "../components/DraftMapCommentModal";
 import MediaGridItem from "../components/MediaGridItem";
 import PhotoUploadButton from "../components/PhotoUploadButton";
 import ProjectSelector from "../../landowner/components/ProjectSelector";
@@ -623,7 +624,7 @@ const ProjectDetail = () => {
                 isUploading={docUploadState.key === slot.key}
                 isDeleting={docDeleteState.key === slot.key}
                 isAdmin={isAdmin}
-                comments={slot.key === 'draftMap' ? project?.draftMapComments : null}
+                comments={null} // COMMENTED OUT: slot.key === 'draftMap' ? project?.draftMapComments : null
                 onAddComment={openStandaloneCommentModal}
               />
             ))}
@@ -702,6 +703,7 @@ const ProjectDetail = () => {
         </div>
       </div>
 
+      {/* COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
       <DraftMapCommentModal 
         isOpen={isCommentModalOpen}
         onClose={handleCommentModalClose}
@@ -710,6 +712,7 @@ const ProjectDetail = () => {
         mode={commentModalMode}
         fileName={pendingDraftMapUpload?.name}
       />
+      */}
 
       <DateSelectionModal
         isOpen={!!pendingPhotoUpload}

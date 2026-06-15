@@ -54,6 +54,7 @@ router.get('/projects/my-project', airtableController.handleGetLandownerProject)
 router.get('/projects/my-projects', airtableController.handleGetLandownerProjects);
 
 // POST a comment to the draft map - Landowner interaction
-router.post('/projects/:recordId/draft-map/comments', airtableController.handleAddDraftMapComment);
+// COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
+// router.post('/projects/:recordId/draft-map/comments', airtableController.handleAddDraftMapComment);
 
 module.exports = router;

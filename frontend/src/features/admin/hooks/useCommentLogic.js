@@ -67,7 +67,7 @@ export const useCommentLogic = (projectId, setProject, handleDocumentUpload, set
         
         // 2. If upload succeeds, add the comment
         if (comment.trim()) {
-            await apiService.addDraftMapComment(projectId, comment);
+            // await apiService.addDraftMapComment(projectId, comment); // COMMENTED OUT - Field doesn't exist
         }
         
         // 3. Single refresh at the end after both operations complete
@@ -79,7 +79,7 @@ export const useCommentLogic = (projectId, setProject, handleDocumentUpload, set
         addToast("Draft map uploaded with comment", "success");
       } else {
         if (comment.trim()) {
-            const updatedProject = await apiService.addDraftMapComment(projectId, comment);
+            // const updatedProject = await apiService.addDraftMapComment(projectId, comment); // COMMENTED OUT - Field doesn't exist
             setProject(updatedProject);
             addToast("Comment added successfully", "success");
         }

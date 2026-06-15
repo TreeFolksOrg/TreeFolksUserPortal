@@ -245,26 +245,27 @@ export const deleteProject = async (projectId) => {
 };
 
 /**
+ * COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
  * Add a comment to the draft map of a project.
  * 
  * @param {string} projectId 
  * @param {string} comment - The comment text
  * @returns {Promise<object>} Updated project record
  */
-export const addDraftMapComment = async (projectId, comment) => {
-  try {
-    const response = await apiClient.post(`/projects/${projectId}/draft-map/comments`, { comment });
-    if (!response?.data?.success) {
-      throw new Error(response?.data?.message || 'Failed to add comment');
-    }
-    // Return relevant data, possibly updated project
-    return normalizeProjectRecord(response.data.project);
-  } catch (error) {
-    console.error(`API Call: addDraftMapComment(${projectId}) -> Failed.`, error);
-    throw new Error(
-      error?.response?.data?.message ||
-      error?.message ||
-      'Failed to submit comment.'
-    );
-  }
-};
+// export const addDraftMapComment = async (projectId, comment) => {
+//   try {
+//     const response = await apiClient.post(`/projects/${projectId}/draft-map/comments`, { comment });
+//     if (!response?.data?.success) {
+//       throw new Error(response?.data?.message || 'Failed to add comment');
+//     }
+//     // Return relevant data, possibly updated project
+//     return normalizeProjectRecord(response.data.project);
+//   } catch (error) {
+//     console.error(`API Call: addDraftMapComment(${projectId}) -> Failed.`, error);
+//     throw new Error(
+//       error?.response?.data?.message ||
+//       error?.message ||
+//       'Failed to submit comment.'
+//     );
+//   }
+// };
