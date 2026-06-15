@@ -257,14 +257,11 @@ const getProjectsBySeason = async (season) => {
         const normalizedSeason = String(season || '').trim();
         const escapedSeason = escapeFormulaValue(normalizedSeason.toLowerCase());
         
-        // Filter by season AND exclude "Inactive" status
-        const overviewStatusField = FIELD_MAP.apiToAirtable.participationStatus || '⭐-Overview Status';
+        // Filter by season only (frontend will handle status filtering)
         const seasonFilterFormula = `LOWER(TRIM({${SEASON_FIELD_NAME}} & "")) = "${escapedSeason}"`;
-        const statusFilterFormula = `{${overviewStatusField}} != "Inactive"`;
-        const combinedFilterFormula = `AND(${seasonFilterFormula}, ${statusFilterFormula})`;
 
         console.log(`Fetching projects for season: ${normalizedSeason}`); // Removed long fields list log
-        console.log(`Using combined filter formula: ${combinedFilterFormula}`);
+        console.log(`Using filter formula: ${seasonFilterFormula}`);
 
         // Sort by Owner Last Name (alphabetically)
         const lastNameField = FIELD_MAP.apiToAirtable.ownerDisplayName || 'Owner Last Name or Site Name';
@@ -272,7 +269,7 @@ const getProjectsBySeason = async (season) => {
         table.select({
             // maxRecords: 100, // Consider pagination for large bases
             // Intentionally do not set view so records hidden by a specific Airtable view are still returned.
-            filterByFormula: combinedFilterFormula,
+            filterByFormula: seasonFilterFormula,
             fields: fieldsToSelect, // Only fetch necessary fields
             sort: [{ field: lastNameField, direction: 'asc' }] // Alphabetize by Last Name
         }).eachPage(

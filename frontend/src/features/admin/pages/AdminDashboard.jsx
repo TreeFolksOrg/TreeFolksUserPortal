@@ -60,11 +60,12 @@ const AdminDashboard = () => {
       );
 
       // 3. Normalize and sort data (newest year first)
+      // Exclude Inactive projects from the count
       const normalizedSeasons = seasonProjects
         .map(({ year, projects }) => ({
           id: year,
           year,
-          projectCount: projects.length,
+          projectCount: projects.filter(p => p.participationStatus !== 'Inactive').length,
         }))
         .sort((a, b) => b.year.localeCompare(a.year));
 

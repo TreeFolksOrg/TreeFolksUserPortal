@@ -44,11 +44,12 @@ const SeasonProjectList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Overview Status filters (all checked by default)
+  // Overview Status filters (Active, Planting Complete, Replant checked by default; Inactive unchecked)
   const [statusFilters, setStatusFilters] = useState({
     Active: true,
     'Planting Complete': true,
-    Replant: true
+    Replant: true,
+    Inactive: false
   });
 
   // --- Effects ---
