@@ -285,6 +285,16 @@ const ProjectDetail = () => {
       value: project.seasonYear || "N/A",
       placeholder: "N/A",
     },
+    {
+      label: "Overview Status",
+      value: project.participationStatus || "N/A",
+      placeholder: "N/A",
+    },
+    {
+      label: "Program",
+      value: project.program || "N/A",
+      placeholder: "N/A",
+    },
   ];
 
   const acreageFields = [

@@ -72,6 +72,7 @@ const FIELD_DEFINITIONS = [
     // Project Details
     { api: 'season', airtable: '⭐-Season' },
     { api: 'status', airtable: '⭐-Current Status' },
+    { api: 'program', airtable: '⭐-Program' },
     { api: 'landRegion', airtable: 'Ecoregion' },
     { api: 'propertyId', airtable: 'Property ID Number(s)' },
     { api: 'siteNumber', airtable: '⭐-Site #' },
@@ -255,16 +256,25 @@ const getProjectsBySeason = async (season) => {
         const fieldsToSelect = Object.keys(FIELD_MAP.airtableToApi); // Select all mapped fields for simplicity or curate as before
         const normalizedSeason = String(season || '').trim();
         const escapedSeason = escapeFormulaValue(normalizedSeason.toLowerCase());
+        
+        // Filter by season AND exclude "Inactive" status
+        const overviewStatusField = FIELD_MAP.apiToAirtable.participationStatus || '⭐-Overview Status';
         const seasonFilterFormula = `LOWER(TRIM({${SEASON_FIELD_NAME}} & "")) = "${escapedSeason}"`;
+        const statusFilterFormula = `{${overviewStatusField}} != "Inactive"`;
+        const combinedFilterFormula = `AND(${seasonFilterFormula}, ${statusFilterFormula})`;
 
         console.log(`Fetching projects for season: ${normalizedSeason}`); // Removed long fields list log
-        console.log(`Using season filter formula: ${seasonFilterFormula}`);
+        console.log(`Using combined filter formula: ${combinedFilterFormula}`);
+
+        // Sort by Owner Last Name (alphabetically)
+        const lastNameField = FIELD_MAP.apiToAirtable.ownerDisplayName || 'Owner Last Name or Site Name';
 
         table.select({
             // maxRecords: 100, // Consider pagination for large bases
             // Intentionally do not set view so records hidden by a specific Airtable view are still returned.
-            filterByFormula: seasonFilterFormula,
-            fields: fieldsToSelect // Only fetch necessary fields
+            filterByFormula: combinedFilterFormula,
+            fields: fieldsToSelect, // Only fetch necessary fields
+            sort: [{ field: lastNameField, direction: 'asc' }] // Alphabetize by Last Name
         }).eachPage(
             (records, fetchNextPage) => {
                 records.forEach((record) => {

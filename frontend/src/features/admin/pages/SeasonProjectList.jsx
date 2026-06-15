@@ -43,6 +43,13 @@ const SeasonProjectList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Overview Status filters (all checked by default)
+  const [statusFilters, setStatusFilters] = useState({
+    Active: true,
+    'Planting Complete': true,
+    Replant: true
+  });
 
   // --- Effects ---
 
@@ -103,11 +110,24 @@ const SeasonProjectList = () => {
   // --- Computed Values ---
 
   /**
-   * Filter projects based on the search term.
+   * Filter projects based on the search term and status filters.
    * Checks multiple fields: name, address, landowner, location, zip, site number.
    */
   const searchValue = searchTerm.toLowerCase();
   const filteredProjects = projects.filter((project) => {
+    // First filter by Overview Status checkboxes
+    const participationStatus = project.participationStatus || '';
+    const isStatusMatch = statusFilters[participationStatus] === true;
+    
+    if (!isStatusMatch) {
+      return false;
+    }
+    
+    // Then filter by search term
+    if (!searchTerm) {
+      return true;
+    }
+    
     const nameCandidate =
       project.ownerDisplayName ||
       project.ownerFirstName ||
@@ -129,6 +149,14 @@ const SeasonProjectList = () => {
       normalizedSiteNumber.includes(searchValue)
     );
   });
+
+  // Handler for status filter checkboxes
+  const handleStatusFilterChange = (status) => {
+    setStatusFilters(prev => ({
+      ...prev,
+      [status]: !prev[status]
+    }));
+  };
 
   // --- Render Helpers ---
 
@@ -205,6 +233,21 @@ const SeasonProjectList = () => {
                   onChange={setSearchTerm}
                   placeholder={`Search by name, site #, loc, or zip within ${normalizedSeasonYear || seasonYear || ''}...`}
               />
+          </div>
+          {/* Status Filters */}
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <span className="text-sm font-medium text-gray-700">Filter by Overview Status:</span>
+            {Object.keys(statusFilters).map((status) => (
+              <label key={status} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={statusFilters[status]}
+                  onChange={() => handleStatusFilterChange(status)}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+                <span className="text-sm text-gray-700">{status}</span>
+              </label>
+            ))}
           </div>
        </div>
 
