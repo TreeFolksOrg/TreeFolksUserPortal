@@ -42,6 +42,14 @@ const LoginPage = () => {
   const [signupError, setSignupError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Validate comma-separated email list
+  const validateSecondaryEmails = (emailString) => {
+    if (!emailString.trim()) return true; // Empty is valid (optional field)
+    const emails = emailString.split(',').map(e => e.trim()).filter(Boolean);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emails.every(email => emailRegex.test(email));
+  };
+
   const redirectPath = useMemo(() => {
     if (!user) {
       return "/login";
@@ -87,6 +95,11 @@ const LoginPage = () => {
 
     if (signupValues.password !== signupValues.confirmPassword) {
       setSignupError("Passwords do not match.");
+      return;
+    }
+
+    if (!validateSecondaryEmails(signupValues.secondaryEmails)) {
+      setSignupError("Invalid email format in secondary emails. Please use comma-separated valid email addresses.");
       return;
     }
 
@@ -236,7 +249,7 @@ const LoginPage = () => {
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Add additional email addresses (comma-separated) that should have access to your project(s)
+                Additional email addresses (comma-separated) that can access your project(s). Checked in both your account and Airtable.
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">

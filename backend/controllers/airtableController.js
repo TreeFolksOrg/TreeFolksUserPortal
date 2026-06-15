@@ -149,9 +149,9 @@ const handleGetLandownerProject = asyncHandler(async (req, res) => {
         return res.status(401).json({ message: "User email not found in token." });
     }
 
-    const { email } = req.user;
+    const { email, secondaryEmails } = req.user;
     try {
-        const project = await airtableService.findProjectByEmail(email);
+        const project = await airtableService.findProjectByEmail(email, secondaryEmails || '');
         if (!project) {
             return res.status(404).json({ message: "No project found for this email." });
         }
@@ -168,9 +168,9 @@ const handleGetLandownerProjects = asyncHandler(async (req, res) => {
         return res.status(401).json({ message: "User email not found in token." });
     }
 
-    const { email } = req.user;
+    const { email, secondaryEmails } = req.user;
     try {
-        const projects = await airtableService.findAllProjectsByEmail(email);
+        const projects = await airtableService.findAllProjectsByEmail(email, secondaryEmails || '');
         // Return empty array with 200 if no projects found (not 404)
         res.json(projects || []);
     } catch (error) {
@@ -197,7 +197,7 @@ const handleUploadProjectDocument = asyncHandler(async (req, res) => {
         }
 
         // Use findAllProjectsByEmail to support landowners with multiple projects
-        const landownerProjects = await airtableService.findAllProjectsByEmail(req.user.email);
+        const landownerProjects = await airtableService.findAllProjectsByEmail(req.user.email, req.user.secondaryEmails || '');
         const hasAccess = landownerProjects.some(project => project.id === recordId);
         if (!hasAccess) {
             return res.status(403).json({ message: "Access denied to this project." });

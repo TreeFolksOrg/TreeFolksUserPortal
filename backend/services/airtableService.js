@@ -312,7 +312,14 @@ const getProjectDetails = async (recordId) => {
     }
 };
 
-const findProjectByEmail = async (email) => {
+/**
+ * Finds a single project associated with a given email address.
+ * Checks both Airtable secondary emails AND Firebase secondary emails.
+ * @param {string} email - The email address to search for
+ * @param {string} firebaseSecondaryEmails - Comma-separated secondary emails from Firebase profile
+ * @returns {Promise<object|null>} - Normalized project record or null
+ */
+const findProjectByEmail = async (email, firebaseSecondaryEmails = '') => {
     if (!email) throw new Error('Email is required to find project.');
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -348,15 +355,22 @@ const findProjectByEmail = async (email) => {
         const foundRecord = processRecord(records[0]);
 
         // CRITICAL: Post-fetch verification to prevent data leaks
-        // Check if the email matches either primary or any secondary email
+        // Check if the email matches primary, Airtable secondary emails, OR Firebase secondary emails
         const recordEmail = (foundRecord.email || '').toLowerCase().trim();
-        const secondaryEmails = (foundRecord.secondaryEmails || '')
+        const airtableSecondaryEmails = (foundRecord.secondaryEmails || '')
+            .toLowerCase()
+            .split(',')
+            .map(e => e.trim())
+            .filter(Boolean);
+        const firebaseSecondaryEmailsList = (firebaseSecondaryEmails || '')
             .toLowerCase()
             .split(',')
             .map(e => e.trim())
             .filter(Boolean);
         
-        const hasAccess = recordEmail === normalizedEmail || secondaryEmails.includes(normalizedEmail);
+        const hasAccess = recordEmail === normalizedEmail || 
+                         airtableSecondaryEmails.includes(normalizedEmail) ||
+                         firebaseSecondaryEmailsList.includes(normalizedEmail);
         
         if (!hasAccess) {
             console.error(`DATA LEAK PREVENTED: Requested email '${normalizedEmail}' but record doesn't have matching primary or secondary email. Record ID: ${foundRecord.id}`);
@@ -372,11 +386,13 @@ const findProjectByEmail = async (email) => {
 
 /**
  * Finds ALL projects associated with a given email address.
+ * Checks both Airtable secondary emails AND Firebase secondary emails.
  * Used for landowners who may have multiple projects.
  * @param {string} email - The email address to search for
+ * @param {string} firebaseSecondaryEmails - Comma-separated secondary emails from Firebase profile
  * @returns {Promise<Array>} - Array of normalized project records
  */
-const findAllProjectsByEmail = async (email) => {
+const findAllProjectsByEmail = async (email, firebaseSecondaryEmails = '') => {
     if (!email) throw new Error('Email is required to find projects.');
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -408,15 +424,22 @@ const findAllProjectsByEmail = async (email) => {
                 (records, fetchNextPage) => {
                     records.forEach((record) => {
                         const processed = processRecord(record);
-                        // Verify email matches primary or any secondary email to prevent data leaks
+                        // Verify email matches primary, Airtable secondary, OR Firebase secondary emails
                         const recordEmail = (processed.email || '').toLowerCase().trim();
-                        const secondaryEmails = (processed.secondaryEmails || '')
+                        const airtableSecondaryEmails = (processed.secondaryEmails || '')
+                            .toLowerCase()
+                            .split(',')
+                            .map(e => e.trim())
+                            .filter(Boolean);
+                        const firebaseSecondaryEmailsList = (firebaseSecondaryEmails || '')
                             .toLowerCase()
                             .split(',')
                             .map(e => e.trim())
                             .filter(Boolean);
                         
-                        const hasAccess = recordEmail === normalizedEmail || secondaryEmails.includes(normalizedEmail);
+                        const hasAccess = recordEmail === normalizedEmail || 
+                                         airtableSecondaryEmails.includes(normalizedEmail) ||
+                                         firebaseSecondaryEmailsList.includes(normalizedEmail);
                         
                         if (hasAccess) {
                             allRecords.push(processed);

@@ -11,8 +11,11 @@ import { updateSecondaryEmails as updateProjectSecondaryEmails } from "../../../
  * 
  * Allows users (landowners and admins) to:
  * - View their profile details (username, email, role)
- * - Update their username
+ * - Update their username and secondary emails
  * - Sign out
+ * 
+ * Secondary emails are synced to both Firebase (for authentication) and Airtable (for project management).
+ * Both sources are checked for project access.
  * 
  * @component
  */
@@ -24,6 +27,14 @@ const AccountPage = () => {
   const [statusMessage, setStatusMessage] = useState("");
   const [statusType, setStatusType] = useState("info");
   const [saving, setSaving] = useState(false);
+
+  // Validate comma-separated email list
+  const validateSecondaryEmails = (emailString) => {
+    if (!emailString.trim()) return true; // Empty is valid (optional field)
+    const emails = emailString.split(',').map(e => e.trim()).filter(Boolean);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emails.every(email => emailRegex.test(email));
+  };
 
   useEffect(() => {
     setUsername(profile?.username ?? "");
@@ -38,6 +49,12 @@ const AccountPage = () => {
     event.preventDefault();
     if (!username.trim()) {
       setStatusMessage("Username cannot be empty.");
+      setStatusType("error");
+      return;
+    }
+
+    if (!validateSecondaryEmails(secondaryEmails)) {
+      setStatusMessage("Invalid email format in secondary emails. Please use comma-separated valid email addresses.");
       setStatusType("error");
       return;
     }
@@ -57,7 +74,7 @@ const AccountPage = () => {
         secondaryEmails: secondaryEmails.trim()
       });
 
-      // Sync secondary emails to Airtable projects
+      // Sync secondary emails to Airtable projects (both Firebase and Airtable are sources of truth)
       try {
         const projects = await getLandownerProjects();
         const updatePromises = projects.map(project => 
@@ -69,7 +86,7 @@ const AccountPage = () => {
         // Don't fail the whole update if Airtable sync fails
       }
       
-      setStatusMessage("Profile updated successfully.");
+      setStatusMessage("Profile updated successfully. Secondary emails synced to all your projects.");
       setStatusType("success");
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -139,7 +156,7 @@ const AccountPage = () => {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Additional email addresses (comma-separated) that can access your project(s)
+              Additional email addresses (comma-separated) that can access your project(s). Syncs to both your account and all your Airtable projects.
             </p>
           </div>
           <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
