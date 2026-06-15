@@ -65,7 +65,7 @@ const FIELD_DEFINITIONS = [
     { api: 'address', airtable: 'Property Address' },
     { api: 'phone', airtable: '☎️-Primary Phone Number' },
     { api: 'email', airtable: '📩-Email' },
-    { api: 'secondaryEmails', airtable: 'Secondary Email' },
+    { api: 'secondaryEmails', airtable: '📩-Secondary E-Mail' },
     { api: 'city', airtable: '📍-City' },
     { api: 'zipCode', airtable: '📍-Zip Code' },
     { api: 'county', airtable: '📍-County' },
@@ -319,14 +319,17 @@ const findProjectByEmail = async (email) => {
     console.log(`Searching for project with email: ${normalizedEmail}`);
 
     // Escape email for Airtable formula to prevent injection/formula breakage
-    const emailField = FIELD_MAP.apiToAirtable.email || 'Email';
-    const secondaryEmailField = FIELD_MAP.apiToAirtable.secondaryEmails || 'Secondary Email';
+    const emailField = FIELD_MAP.apiToAirtable.email || '📩-Email';
+    const secondaryEmailField = FIELD_MAP.apiToAirtable.secondaryEmails || '📩-Secondary E-Mail';
     const escapedEmail = escapeFormulaValue(normalizedEmail);
     
     // Check both primary email and secondary emails (comma-separated)
     const filterFormula = `OR(
-        LOWER({${emailField}}) = "${escapedEmail}",
-        FIND("${escapedEmail}", LOWER({${secondaryEmailField}}))
+        LOWER({${emailField}}) = \"${escapedEmail}\",
+        AND(
+            {${secondaryEmailField}} != \"\",
+            FIND(\"${escapedEmail}\", LOWER({${secondaryEmailField}}))
+        )
     )`;
 
     console.log(`Using filter formula: ${filterFormula}`);
@@ -379,14 +382,17 @@ const findAllProjectsByEmail = async (email) => {
     const normalizedEmail = email.toLowerCase().trim();
     console.log(`Searching for ALL projects with email: ${normalizedEmail}`);
 
-    const emailField = FIELD_MAP.apiToAirtable.email || 'Email';
-    const secondaryEmailField = FIELD_MAP.apiToAirtable.secondaryEmails || 'Secondary Email';
+    const emailField = FIELD_MAP.apiToAirtable.email || '📩-Email';
+    const secondaryEmailField = FIELD_MAP.apiToAirtable.secondaryEmails || '📩-Secondary E-Mail';
     const escapedEmail = escapeFormulaValue(normalizedEmail);
     
     // Check both primary email and secondary emails (comma-separated)
     const filterFormula = `OR(
-        LOWER({${emailField}}) = "${escapedEmail}",
-        FIND("${escapedEmail}", LOWER({${secondaryEmailField}}))
+        LOWER({${emailField}}) = \"${escapedEmail}\",
+        AND(
+            {${secondaryEmailField}} != \"\",
+            FIND(\"${escapedEmail}\", LOWER({${secondaryEmailField}}))
+        )
     )`;
 
     console.log(`Using filter formula: ${filterFormula}`);
