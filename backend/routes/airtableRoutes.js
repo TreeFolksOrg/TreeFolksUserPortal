@@ -56,6 +56,9 @@ router.get('/projects/my-projects', airtableController.handleGetLandownerProject
 // PATCH update secondary emails for a project (landowners can update their own projects, admins can update any)
 router.patch('/projects/:recordId/secondary-emails', airtableController.handleUpdateSecondaryEmails);
 
+// POST sync Firebase secondary emails to all user's Airtable projects
+router.post('/sync-secondary-emails', airtableController.handleSyncSecondaryEmails);
+
 // POST a comment to the draft map - Landowner interaction
 // COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
 // router.post('/projects/:recordId/draft-map/comments', airtableController.handleAddDraftMapComment);

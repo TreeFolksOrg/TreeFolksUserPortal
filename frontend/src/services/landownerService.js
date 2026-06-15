@@ -52,3 +52,23 @@ export const getLandownerProject = async () => {
       );
     }
   };
+
+/**
+ * Syncs Firebase secondary emails to all user's Airtable projects.
+ * Merges Firebase secondary emails with existing Airtable secondary emails.
+ * 
+ * @returns {Promise<object>} Sync result with updated project count
+ */
+export const syncSecondaryEmailsToProjects = async () => {
+  try {
+    const response = await apiClient.post('/sync-secondary-emails');
+    return response.data;
+  } catch (error) {
+    console.error('API Call: syncSecondaryEmailsToProjects() -> Failed.', error);
+    throw new Error(
+      error?.response?.data?.message ||
+      error?.message ||
+      'Failed to sync secondary emails to projects.'
+    );
+  }
+};

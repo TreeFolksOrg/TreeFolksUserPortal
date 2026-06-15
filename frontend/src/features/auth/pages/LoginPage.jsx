@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../../firebase";
 import { useAuth } from "../AuthProvider";
+import { syncSecondaryEmailsToProjects } from "../../../services/landownerService";
 
 const initialSignupState = {
   username: "",
@@ -73,6 +74,15 @@ const LoginPage = () => {
 
     try {
       await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+      
+      // Sync Firebase secondary emails to Airtable projects (non-blocking)
+      try {
+        await syncSecondaryEmailsToProjects();
+        console.log('Secondary emails synced to Airtable projects');
+      } catch (syncError) {
+        console.warn('Failed to sync secondary emails to Airtable:', syncError);
+        // Don't block login if sync fails
+      }
     } catch (error) {
       console.error("Login failed:", error);
       setLoginError(

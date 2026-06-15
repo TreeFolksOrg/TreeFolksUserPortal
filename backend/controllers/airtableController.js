@@ -587,6 +587,34 @@ const handleUpdateSecondaryEmails = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * Sync Firebase secondary emails to user's Airtable projects
+ * Merges Firebase secondary emails with existing Airtable secondary emails
+ */
+const handleSyncSecondaryEmails = asyncHandler(async (req, res) => {
+    if (!req.user || !req.user.email) {
+        return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    try {
+        const primaryEmail = req.user.email;
+        const firebaseSecondaryEmails = req.user.secondaryEmails || '';
+        
+        const result = await airtableService.syncSecondaryEmailsToProjects(
+            primaryEmail,
+            firebaseSecondaryEmails
+        );
+        
+        res.json({
+            success: true,
+            ...result
+        });
+    } catch (error) {
+        console.error(`Error syncing secondary emails for ${req.user.email}:`, error);
+        res.status(500).json({ message: "Failed to sync secondary emails." });
+    }
+});
+
 module.exports = {
     handleGetAllSeasons,
     handleGetProjectsBySeason,
@@ -602,5 +630,6 @@ module.exports = {
     handleGetLandownerProject,
     handleGetLandownerProjects,
     handleUpdateSecondaryEmails,
+    handleSyncSecondaryEmails,
     // handleAddDraftMapComment, // COMMENTED OUT - Draft Map Comments field doesn't exist
 };
