@@ -4,7 +4,7 @@ import { db } from "../../../firebase";
 import { useAuth } from "../AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { getLandownerProjects } from "../../../services/landownerService";
-import { updateSecondaryEmails as updateProjectSecondaryEmails } from "../../../services/projectService";
+import { updateSecondaryEmails as updateProjectSecondaryEmails, resetSeasonProjectsCache } from "../../../services/projectService";
 
 /**
  * AccountPage - User account management page
@@ -81,6 +81,10 @@ const AccountPage = () => {
           updateProjectSecondaryEmails(project.id, secondaryEmails.trim())
         );
         await Promise.all(updatePromises);
+        
+        // Clear project cache so UI shows fresh data when navigating to projects
+        resetSeasonProjectsCache();
+        console.log('[AccountPage] Secondary emails synced and cache cleared');
       } catch (airtableError) {
         console.warn("Failed to sync secondary emails to Airtable:", airtableError);
         // Don't fail the whole update if Airtable sync fails

@@ -13,6 +13,7 @@ import {
 import { auth, db } from "../../../firebase";
 import { useAuth } from "../AuthProvider";
 import { syncSecondaryEmailsToProjects } from "../../../services/landownerService";
+import { resetSeasonProjectsCache } from "../../../services/projectService";
 
 const initialSignupState = {
   username: "",
@@ -85,6 +86,10 @@ const LoginPage = () => {
         console.log('[LOGIN] Starting secondary email sync...');
         const syncResult = await syncSecondaryEmailsToProjects();
         console.log('[LOGIN] Secondary emails sync result:', syncResult);
+        
+        // Clear project cache so UI shows fresh synced data
+        resetSeasonProjectsCache();
+        console.log('[LOGIN] Project cache cleared after sync');
       } catch (syncError) {
         console.warn('[LOGIN] Failed to sync secondary emails to Airtable:', syncError);
         // Don't block login if sync fails
