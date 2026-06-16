@@ -60,12 +60,24 @@ const authenticateRequest = async (req, res, next) => {
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
     
-    // Fetch full user profile to get admin status
+    // Fetch full user profile to get admin status and secondary emails
     try {
       const userDoc = await admin.firestore().collection("users").doc(decodedToken.uid).get();
       if (userDoc.exists) {
-        req.user = { ...decodedToken, ...userDoc.data(), admin: userDoc.data().isAdmin };
+        const userData = userDoc.data();
+        req.user = { 
+          ...decodedToken, 
+          ...userData, 
+          admin: userData.isAdmin 
+        };
+        console.log('[Auth] Loaded user profile:', {
+          uid: decodedToken.uid,
+          email: req.user.email,
+          secondaryEmails: req.user.secondaryEmails,
+          admin: req.user.admin
+        });
       } else {
+        console.warn('[Auth] User document not found in Firestore for uid:', decodedToken.uid);
         req.user = decodedToken;
       }
     } catch (profileError) {

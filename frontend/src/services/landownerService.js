@@ -61,10 +61,17 @@ export const getLandownerProject = async () => {
  */
 export const syncSecondaryEmailsToProjects = async () => {
   try {
+    console.log('[SYNC API] Calling /sync-secondary-emails endpoint...');
     const response = await apiClient.post('/sync-secondary-emails');
+    console.log('[SYNC API] Response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('API Call: syncSecondaryEmailsToProjects() -> Failed.', error);
+    console.error('[SYNC API] Failed:', error);
+    console.error('[SYNC API] Error details:', {
+      message: error?.message,
+      response: error?.response?.data,
+      status: error?.response?.status
+    });
     throw new Error(
       error?.response?.data?.message ||
       error?.message ||

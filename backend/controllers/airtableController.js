@@ -596,21 +596,34 @@ const handleSyncSecondaryEmails = asyncHandler(async (req, res) => {
         return res.status(401).json({ message: "Unauthorized." });
     }
 
+    console.log('[SYNC CONTROLLER] User object:', {
+        email: req.user.email,
+        secondaryEmails: req.user.secondaryEmails,
+        uid: req.user.uid
+    });
+
     try {
         const primaryEmail = req.user.email;
         const firebaseSecondaryEmails = req.user.secondaryEmails || '';
+        
+        console.log('[SYNC CONTROLLER] Calling syncSecondaryEmailsToProjects with:', {
+            primaryEmail,
+            firebaseSecondaryEmails
+        });
         
         const result = await airtableService.syncSecondaryEmailsToProjects(
             primaryEmail,
             firebaseSecondaryEmails
         );
         
+        console.log('[SYNC CONTROLLER] Sync result:', result);
+        
         res.json({
             success: true,
             ...result
         });
     } catch (error) {
-        console.error(`Error syncing secondary emails for ${req.user.email}:`, error);
+        console.error(`[SYNC CONTROLLER] Error syncing secondary emails for ${req.user.email}:`, error);
         res.status(500).json({ message: "Failed to sync secondary emails." });
     }
 });

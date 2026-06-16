@@ -75,12 +75,18 @@ const LoginPage = () => {
     try {
       await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
       
+      console.log('[LOGIN] User signed in, waiting for token refresh...');
+      
+      // Wait a moment for Firebase to fully authenticate and token to be ready
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // Sync Firebase secondary emails to Airtable projects (non-blocking)
       try {
-        await syncSecondaryEmailsToProjects();
-        console.log('Secondary emails synced to Airtable projects');
+        console.log('[LOGIN] Starting secondary email sync...');
+        const syncResult = await syncSecondaryEmailsToProjects();
+        console.log('[LOGIN] Secondary emails sync result:', syncResult);
       } catch (syncError) {
-        console.warn('Failed to sync secondary emails to Airtable:', syncError);
+        console.warn('[LOGIN] Failed to sync secondary emails to Airtable:', syncError);
         // Don't block login if sync fails
       }
     } catch (error) {

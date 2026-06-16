@@ -1162,59 +1162,82 @@ const detachDocumentAtIndex = async (recordId, documentType, index) => {
  */
 const syncSecondaryEmailsToProjects = async (primaryEmail, firebaseSecondaryEmails) => {
     try {
-        console.log(`Syncing secondary emails for primary email: ${primaryEmail}`);
+        console.log(`[SYNC] Starting sync for primary email: ${primaryEmail}`);
+        console.log(`[SYNC] Firebase secondary emails: "${firebaseSecondaryEmails}"`);
         
         // Normalize Firebase secondary emails
         const firebaseEmailsList = firebaseSecondaryEmails
             ? firebaseSecondaryEmails.split(',').map(e => e.trim().toLowerCase()).filter(e => e)
             : [];
         
+        console.log(`[SYNC] Normalized Firebase emails:`, firebaseEmailsList);
+        
         if (firebaseEmailsList.length === 0) {
-            console.log('No Firebase secondary emails to sync');
+            console.log('[SYNC] No Firebase secondary emails to sync');
             return { updatedCount: 0, message: 'No secondary emails to sync' };
         }
         
         // Find all projects for this user
         const projects = await findAllProjectsByEmail(primaryEmail, firebaseSecondaryEmails);
-        console.log(`Found ${projects.length} projects for ${primaryEmail}`);
+        console.log(`[SYNC] Found ${projects.length} projects for ${primaryEmail}`);
         
         if (projects.length === 0) {
+            console.log('[SYNC] No projects found for user');
             return { updatedCount: 0, message: 'No projects found for user' };
         }
         
         let updatedCount = 0;
         const secondaryEmailFieldName = FIELD_MAP.apiToAirtable.secondaryEmails;
+        console.log(`[SYNC] Using Airtable field name: "${secondaryEmailFieldName}"`);
         
         for (const project of projects) {
+            console.log(`[SYNC] Processing project ${project.id}...`);
             const currentAirtableEmails = project.secondaryEmails || '';
+            console.log(`[SYNC] Current Airtable secondary emails for ${project.id}: "${currentAirtableEmails}"`);
+            
             const airtableEmailsList = currentAirtableEmails
                 .split(',')
                 .map(e => e.trim().toLowerCase())
                 .filter(e => e);
             
+            console.log(`[SYNC] Normalized Airtable emails:`, airtableEmailsList);
+            
             // Find emails that are in Firebase but not in Airtable
             const emailsToAdd = firebaseEmailsList.filter(email => !airtableEmailsList.includes(email));
+            
+            console.log(`[SYNC] Emails to add:`, emailsToAdd);
             
             if (emailsToAdd.length > 0) {
                 // Merge emails (Airtable emails + new Firebase emails)
                 const mergedEmails = [...new Set([...airtableEmailsList, ...emailsToAdd])].join(', ');
                 
-                console.log(`Updating project ${project.id}: Adding ${emailsToAdd.length} new email(s)`);
+                console.log(`[SYNC] Updating project ${project.id}: Adding ${emailsToAdd.length} new email(s)`);
+                console.log(`[SYNC] Merged emails: "${mergedEmails}"`);
                 
-                // Update the project
-                const updatePayload = [{
-                    id: project.id,
-                    fields: {
-                        [secondaryEmailFieldName]: mergedEmails,
-                    },
-                }];
-                
-                await table.update(updatePayload, { typecast: true });
-                updatedCount++;
+                try {
+                    // Update the project
+                    const updatePayload = [{
+                        id: project.id,
+                        fields: {
+                            [secondaryEmailFieldName]: mergedEmails,
+                        },
+                    }];
+                    
+                    console.log(`[SYNC] Update payload:`, JSON.stringify(updatePayload, null, 2));
+                    
+                    const updated = await table.update(updatePayload, { typecast: true });
+                    console.log(`[SYNC] Successfully updated project ${project.id}`);
+                    updatedCount++;
+                } catch (updateError) {
+                    console.error(`[SYNC] Failed to update project ${project.id}:`, updateError);
+                    throw updateError;
+                }
+            } else {
+                console.log(`[SYNC] Project ${project.id} already has all Firebase secondary emails`);
             }
         }
         
-        console.log(`Sync complete: Updated ${updatedCount} of ${projects.length} projects`);
+        console.log(`[SYNC] Sync complete: Updated ${updatedCount} of ${projects.length} projects`);
         return {
             updatedCount,
             totalProjects: projects.length,
@@ -1223,7 +1246,7 @@ const syncSecondaryEmailsToProjects = async (primaryEmail, firebaseSecondaryEmai
                 : 'All projects already have the latest secondary emails'
         };
     } catch (error) {
-        console.error('Error syncing secondary emails to projects:', error);
+        console.error('[SYNC] Error syncing secondary emails to projects:', error);
         throw createServiceError(error.message || 'Failed to sync secondary emails to projects');
     }
 };
