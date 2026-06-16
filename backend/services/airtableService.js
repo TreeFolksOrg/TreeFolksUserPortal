@@ -93,13 +93,16 @@ const FIELD_DEFINITIONS = [
     { api: 'uplandTrees', airtable: '🌳-UPL Trees' },
     { api: 'totalTrees', airtable: '🌳-TOTAL Trees' },
     { api: 'quizScorePreConsultation', airtable: '📝-Quiz-Pre-consult' },
+    { api: 'quizDatePre', airtable: '📝-Quiz Date-Pre' },
     { api: 'quizScorePostPlanting', airtable: '📝-Quiz-Post-Planting' },
     { api: 'participationStatus', airtable: '⭐-Overview Status' },
 
     // Maps & Documents (Using Url suffix to match Read logic and Attachment handling)
     { api: 'initialMapUrl', airtable: '🗺️-Initial Map' },
     { api: 'draftMapUrl', airtable: '🗺️-Draft Map' },
+    { api: 'draftMapApproved', airtable: 'Draft Map Approved' },
     { api: 'finalMapUrl', airtable: '🗺️-Final Map' },
+    { api: 'finalMapApproved', airtable: 'Final Map Approved' },
     { api: 'replantingMapUrl', airtable: '🗺️-Replant Map' },
 
     // Attachments / Collections

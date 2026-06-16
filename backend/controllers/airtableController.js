@@ -190,10 +190,10 @@ const handleUploadProjectDocument = asyncHandler(async (req, res) => {
              return res.status(401).json({ message: "Unauthorized." });
         }
         
-        // Strict check: Landowners can ONLY upload 'draftMap' or photos
-        const allowedTypes = ['draftMap', 'plantingPhotoUrls', 'beforePhotoUrls', 'propertyImageUrls'];
+        // Strict check: Landowners can upload draft maps, photos, and other attachments
+        const allowedTypes = ['draftMap', 'plantingPhotoUrls', 'beforePhotoUrls', 'propertyImageUrls', 'otherAttachments'];
         if (!allowedTypes.includes(documentType)) {
-            return res.status(403).json({ message: "Landowners can only edit the Draft Map or upload photos." });
+            return res.status(403).json({ message: "Landowners can only edit the Draft Map, upload photos, or add additional documents." });
         }
 
         // Use findAllProjectsByEmail to support landowners with multiple projects
@@ -615,6 +615,60 @@ const handleSyncSecondaryEmails = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * Approve or unapprove a map (Draft or Final)
+ * Landowners can approve their own maps
+ */
+const handleApproveMap = asyncHandler(async (req, res) => {
+    const { recordId } = req.params;
+    const { mapType, approved } = req.body;
+
+    // Validate mapType
+    if (!['draft', 'final'].includes(mapType)) {
+        return res.status(400).json({ message: "Map type must be 'draft' or 'final'." });
+    }
+
+    // Validate approved value
+    if (typeof approved !== 'boolean') {
+        return res.status(400).json({ message: "Approved value must be a boolean." });
+    }
+
+    // Permission Check - must be authenticated
+    if (!req.user || !req.user.email) {
+        return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    // Admins can approve any project's maps
+    if (!req.user.admin) {
+        // Landowners can only approve their own projects
+        const landownerProjects = await airtableService.findAllProjectsByEmail(req.user.email, req.user.secondaryEmails || '');
+        const hasAccess = landownerProjects.some(project => project.id === recordId);
+        
+        if (!hasAccess) {
+            return res.status(403).json({ message: "Access denied to this project." });
+        }
+    }
+
+    try {
+        const fieldName = mapType === 'draft' ? 'draftMapApproved' : 'finalMapApproved';
+        const updatedProject = await airtableService.updateProject(recordId, {
+            [fieldName]: approved
+        });
+        
+        res.json({
+            success: true,
+            project: updatedProject,
+            message: `${mapType === 'draft' ? 'Draft' : 'Final'} map ${approved ? 'approved' : 'unapproved'} successfully.`
+        });
+    } catch (error) {
+        console.error(`Error approving ${mapType} map for ${recordId}:`, error);
+        if (error.message.includes('Record not found')) {
+            return res.status(404).json({ message: 'Project not found.' });
+        }
+        res.status(500).json({ message: `Failed to approve ${mapType} map.` });
+    }
+});
+
 module.exports = {
     handleGetAllSeasons,
     handleGetProjectsBySeason,
@@ -631,5 +685,6 @@ module.exports = {
     handleGetLandownerProjects,
     handleUpdateSecondaryEmails,
     handleSyncSecondaryEmails,
+    handleApproveMap,
     // handleAddDraftMapComment, // COMMENTED OUT - Draft Map Comments field doesn't exist
 };

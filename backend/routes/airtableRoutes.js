@@ -59,6 +59,9 @@ router.patch('/projects/:recordId/secondary-emails', airtableController.handleUp
 // POST sync Firebase secondary emails to all user's Airtable projects
 router.post('/sync-secondary-emails', airtableController.handleSyncSecondaryEmails);
 
+// PATCH approve/unapprove a map (draft or final) - Landowners can approve their own maps
+router.patch('/projects/:recordId/approve-map', airtableController.handleApproveMap);
+
 // POST a comment to the draft map - Landowner interaction
 // COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
 // router.post('/projects/:recordId/draft-map/comments', airtableController.handleAddDraftMapComment);

@@ -1,5 +1,5 @@
 // src/features/admin/pages/ProjectDetail.jsx
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   AlertCircle,
@@ -33,6 +33,7 @@ import { useDocumentManagement } from "../hooks/useDocumentManagement";
 import { usePhotoManagement } from "../hooks/usePhotoManagement";
 import { usePdfEditor } from "../hooks/usePdfEditor";
 import { useCommentLogic } from "../hooks/useCommentLogic";
+import { approveMap } from "../../../services/projectService";
 
 // ==================== Main Component ====================
 
@@ -89,6 +90,22 @@ const ProjectDetail = () => {
     handleAddComment,
     handleCommentModalClose
   } = useCommentLogic(projectId, setProject, handleDocumentUpload, setError, loadProjectDetails);
+
+  // --- Map Approval State & Handler ---
+  const [isApprovingMap, setIsApprovingMap] = useState(false);
+
+  const handleApproveMap = async (mapType, approved) => {
+    setIsApprovingMap(true);
+    try {
+      const updatedProject = await approveMap(projectId, mapType, approved);
+      setProject(updatedProject);
+    } catch (err) {
+      console.error('Failed to approve map:', err);
+      setError(err.message || 'Failed to approve map.');
+    } finally {
+      setIsApprovingMap(false);
+    }
+  };
 
 
   // --- Derived State & Handlers ---
@@ -268,6 +285,11 @@ const ProjectDetail = () => {
       placeholder: "Not recorded",
     },
     {
+      label: "Quiz Date - Pre-consult",
+      value: project.quizDatePre ? formatDate(project.quizDatePre) : "",
+      placeholder: "Not recorded",
+    },
+    {
       label: "Quiz Score - Post-planting",
       value: ensureText(project.quizScorePostPlanting, "Not recorded"),
       placeholder: "Not recorded",
@@ -364,6 +386,29 @@ const ProjectDetail = () => {
             currentProjectId={projectId}
             onSelectProject={handleSelectProject}
         />
+      )}
+
+      {/* Quiz Completion Banner for Landowners */}
+      {!isAdmin && !project.quizScorePreConsultation && (
+        <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-auto max-w-7xl">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
+            <div className="text-sm text-blue-700">
+              <p className="font-medium">It looks like you haven't taken the quiz!</p>
+              <p className="mt-1">
+                Please take it here:{" "}
+                <a
+                  href="https://form.jotform.com/221146225833147"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline hover:text-blue-900"
+                >
+                  Pre-Consultation Quiz
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 space-y-10">
@@ -641,6 +686,9 @@ const ProjectDetail = () => {
                 isAdmin={isAdmin}
                 comments={null} // COMMENTED OUT: slot.key === 'draftMap' ? project?.draftMapComments : null
                 onAddComment={openStandaloneCommentModal}
+                draftMapApproved={project?.draftMapApproved ?? false}
+                finalMapApproved={project?.finalMapApproved ?? false}
+                onApproveMap={handleApproveMap}
               />
             ))}
           </div>

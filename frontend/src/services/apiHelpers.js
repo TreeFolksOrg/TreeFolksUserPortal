@@ -122,6 +122,7 @@ export const normalizeProjectRecord = (record = {}, { seasonYear } = {}) => {
     flaggingDate: record.flaggingDate ?? '',
     plantingDate: record.plantingDate ?? '',
     quizScorePreConsultation: record.quizScorePreConsultation ?? '',
+    quizDatePre: record.quizDatePre ?? '',
     quizScorePostPlanting: record.quizScorePostPlanting ?? '',
     beforePhotoUrls: toArray(record.beforePhotoUrls),
     plantingPhotoUrls: toArray(record.plantingPhotoUrls),
@@ -136,6 +137,8 @@ export const normalizeProjectRecord = (record = {}, { seasonYear } = {}) => {
     status: record.status ?? 'Unknown',
     participationStatus: record.participationStatus ?? '',
     program: record.program ?? '',
+    draftMapApproved: record.draftMapApproved ?? false,
+    finalMapApproved: record.finalMapApproved ?? false,
     // draftMapComments: record.draftMapComments ?? "", // COMMENTED OUT - Field doesn't exist in Airtable
     documents: documentLinks,
     raw: record.raw ?? record,

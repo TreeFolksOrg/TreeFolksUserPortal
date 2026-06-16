@@ -302,3 +302,35 @@ export const updateSecondaryEmails = async (projectId, secondaryEmails) => {
     );
   }
 };
+
+/**
+ * Approve or unapprove a map (draft or final)
+ * @param {string} projectId - The project's Airtable record ID
+ * @param {string} mapType - 'draft' or 'final'
+ * @param {boolean} approved - true to approve, false to unapprove
+ * @returns {Promise<object>} Normalized updated project
+ */
+export const approveMap = async (projectId, mapType, approved) => {
+  try {
+    const response = await apiClient.patch(
+      `/projects/${encodeURIComponent(projectId)}/approve-map`,
+      { mapType, approved }
+    );
+    
+    if (!response?.data?.success) {
+      throw new Error(response?.data?.message || 'Failed to approve map');
+    }
+    
+    // Clear cache to ensure fresh data on next fetch
+    resetSeasonProjectsCache();
+    
+    return normalizeProjectRecord(response.data.project);
+  } catch (error) {
+    console.error(`API Call: approveMap(${projectId}, ${mapType}, ${approved}) -> Failed.`, error);
+    throw new Error(
+      error?.response?.data?.message ||
+      error?.message ||
+      'Failed to approve map.'
+    );
+  }
+};

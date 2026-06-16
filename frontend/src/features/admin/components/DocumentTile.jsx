@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Loader2, Plus, Pencil, MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Plus, Pencil, MessageSquare, ChevronDown, ChevronUp, CheckCircle2 } from "lucide-react";
 
 /**
  * DocumentTile - Manages document uploads, versions, and permissions
@@ -8,12 +8,13 @@ import { Loader2, Plus, Pencil, MessageSquare, ChevronDown, ChevronUp } from "lu
  * - Document display with versioning support
  * - Upload/Replace/Delete/Edit actions with permission checks
  * - Special handling for draft maps (landowner upload, comments)
+ * - Map approval checkboxes for landowners (draft and final maps)
  * - Loading states for all async operations
  * - Version selector for multi-file documents
  * 
  * Permission model:
  * - Admins: Full control (upload, delete, edit all documents)
- * - Landowners: Can only upload new versions of draft maps (no delete)
+ * - Landowners: Can only upload new versions of draft maps (no delete), can approve draft/final maps
  * 
  * @param {object} props
  * @param {object} props.slot - Document slot config { key, label, description, fallbackField }
@@ -22,11 +23,16 @@ import { Loader2, Plus, Pencil, MessageSquare, ChevronDown, ChevronUp } from "lu
  * @param {function} props.onUploadWithComment - Callback(file) for landowner draftMap uploads - opens comment modal
  * @param {function} props.onDelete - Callback(slot) for deletions
  * @param {function} props.onEdit - Callback(slotKey, url, isPdf, filename) to open editor
+ * @param {function} props.onReplaceAtIndex - Callback(slotKey, index, file) to replace file at index
+ * @param {function} props.onDeleteAtIndex - Callback(slotKey, index) to delete file at index
  * @param {boolean} props.isUploading - Loading state during upload
  * @param {boolean} props.isDeleting - Loading state during deletion
  * @param {boolean} props.isAdmin - Whether current user is admin
  * @param {string} props.comments - Draft map comments (Airtable blob - newline separated)
  * @param {function} props.onAddComment - Callback to show standalone comment modal (landowner only)
+ * @param {boolean} props.draftMapApproved - Whether draft map is approved (for draft maps)
+ * @param {boolean} props.finalMapApproved - Whether final map is approved (for final maps)
+ * @param {function} props.onApproveMap - Callback(mapType, approved) to approve/unapprove maps
  */
 const DocumentTile = ({
   slot,
@@ -35,11 +41,16 @@ const DocumentTile = ({
   onUploadWithComment,
   onDelete,
   onEdit,
+  onReplaceAtIndex,
+  onDeleteAtIndex,
   isUploading,
   isDeleting,
   isAdmin,
   comments,
   onAddComment,
+  draftMapApproved = false,
+  finalMapApproved = false,
+  onApproveMap,
 }) => {
   const fileInputRef = useRef(null);
   const [selectedVersionIndex, setSelectedVersionIndex] = useState(null);
@@ -372,6 +383,49 @@ const DocumentTile = ({
           />
         )}
       </div>
+
+      {/* Map Approval Section - For Draft and Final Maps */}
+      {(slot.key === 'draftMap' || slot.key === 'finalMap') && files.length > 0 && (
+        <div className="mt-4 border-t border-gray-100 pt-3">
+          <label className="flex items-center cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={slot.key === 'draftMap' ? draftMapApproved : finalMapApproved}
+              onChange={(e) => {
+                const mapType = slot.key === 'draftMap' ? 'draft' : 'final';
+                onApproveMap?.(mapType, e.target.checked);
+              }}
+              className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            />
+            <span className="ml-2 text-sm text-gray-700 group-hover:text-gray-900 transition">
+              {slot.key === 'draftMap' ? (
+                draftMapApproved ? (
+                  <span className="flex items-center font-medium text-green-700">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    Draft Map Approved
+                  </span>
+                ) : (
+                  "Approve Draft Map"
+                )
+              ) : (
+                finalMapApproved ? (
+                  <span className="flex items-center font-medium text-green-700">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    Final Map Approved
+                  </span>
+                ) : (
+                  "Approve Final Map"
+                )
+              )}
+            </span>
+          </label>
+          {!isAdmin && (
+            <p className="mt-1 text-xs text-gray-500 ml-6">
+              Check this box to approve the {slot.key === 'draftMap' ? 'draft' : 'final'} map
+            </p>
+          )}
+        </div>
+      )}
 
       {/* COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
       {slot.key === 'draftMap' && (
