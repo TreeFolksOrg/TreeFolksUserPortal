@@ -5,8 +5,7 @@ import {
     normalizeProjectRecord, 
     seasonProjectsCache, 
     fullyLoadedSeasons,
-    resetSeasonProjectsCache,
-    getCachedProject
+    resetSeasonProjectsCache
 } from './apiHelpers';
 import { getSeasons } from './seasonService';
 
@@ -121,11 +120,7 @@ export const getProjectDetails = async (projectId) => {
     return null;
   }
 
-  const cachedProject = getCachedProject(projectId);
-  if (cachedProject && cachedProject.wetlandAcres !== undefined) {
-    return cachedProject;
-  }
-
+  // Always fetch fresh data from server to ensure secondary emails and other fields are up-to-date
   try {
     const response = await apiClient.get(`/projects/details/${encodeURIComponent(projectId)}`);
     if (!response.data) {
@@ -133,12 +128,14 @@ export const getProjectDetails = async (projectId) => {
     }
 
     const normalized = normalizeProjectRecord(response.data);
+    
+    // Update cache with fresh data
     if (normalized.seasonYear) {
       const seasonKey = normalizeSeasonKey(normalized.seasonYear);
       const existing = seasonProjectsCache.get(seasonKey) || [];
-      if (!existing.some(project => `${project.id}` === `${normalized.id}`)) {
-        seasonProjectsCache.set(seasonKey, [...existing, normalized]);
-      }
+      // Remove old cached version and add fresh data
+      const filtered = existing.filter(project => `${project.id}` !== `${normalized.id}`);
+      seasonProjectsCache.set(seasonKey, [...filtered, normalized]);
     }
 
     return normalized;
