@@ -17,12 +17,13 @@ const ProjectCard = ({ project }) => {
     project.landowner ||
     "Untitled Project";
 
-  // Badge styling helper for Overview Status (Active, Planting Complete, Replant)
+  // Badge styling helper for Overview Status (Upcoming, Active, Planting Complete, Replant)
   const getOverviewStatusBadgeColor = (overviewStatus) => {
     const statusLower = (overviewStatus || '').toLowerCase();
     if (statusLower.includes('planting complete')) return 'bg-green-100 text-green-800';
     if (statusLower.includes('active')) return 'bg-blue-100 text-blue-800';
-    if (statusLower.includes('replant')) return 'bg-orange-100 text-orange-800';
+    if (statusLower.includes('replant')) return 'bg-purple-100 text-purple-800';
+    if (statusLower.includes('upcoming')) return 'bg-yellow-200 text-yellow-900';
     return 'bg-gray-100 text-gray-800';
   };
 
