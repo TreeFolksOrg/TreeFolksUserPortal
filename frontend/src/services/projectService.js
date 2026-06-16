@@ -334,3 +334,6 @@ export const approveMap = async (projectId, mapType, approved) => {
     );
   }
 };
+
+// Re-export cache management function from apiHelpers
+export { resetSeasonProjectsCache } from './apiHelpers';
