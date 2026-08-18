@@ -399,11 +399,14 @@ const findAllProjectsByEmail = async (email, firebaseSecondaryEmails = '') => {
     if (!email) throw new Error('Email is required to find projects.');
 
     const normalizedEmail = email.toLowerCase().trim();
-    console.log(`Searching for ALL projects with email: ${normalizedEmail}`);
+    console.log(`[FIND ALL PROJECTS] Searching for ALL projects with email: ${normalizedEmail}`);
+    console.log(`[FIND ALL PROJECTS] Firebase secondary emails: ${firebaseSecondaryEmails || 'none'}`);
 
     const emailField = FIELD_MAP.apiToAirtable.email || '📩-Email';
     const secondaryEmailField = FIELD_MAP.apiToAirtable.secondaryEmails || '📩-Secondary E-Mail';
     const escapedEmail = escapeFormulaValue(normalizedEmail);
+    
+    console.log(`[FIND ALL PROJECTS] Email field: ${emailField}, Secondary field: ${secondaryEmailField}`);
     
     // Check both primary email and secondary emails (comma-separated)
     const filterFormula = `OR(
@@ -414,9 +417,10 @@ const findAllProjectsByEmail = async (email, firebaseSecondaryEmails = '') => {
         )
     )`;
 
-    console.log(`Using filter formula: ${filterFormula}`);
+    console.log(`[FIND ALL PROJECTS] Using filter formula: ${filterFormula}`);
 
     try {
+        console.log(`[FIND ALL PROJECTS] Starting Airtable query...`);
         const allRecords = [];
 
         await new Promise((resolve, reject) => {
@@ -425,6 +429,7 @@ const findAllProjectsByEmail = async (email, firebaseSecondaryEmails = '') => {
                 fields: Object.keys(FIELD_MAP.airtableToApi),
             }).eachPage(
                 (records, fetchNextPage) => {
+                    console.log(`[FIND ALL PROJECTS] Processing page with ${records.length} records`);
                     records.forEach((record) => {
                         const processed = processRecord(record);
                         // Verify email matches primary, Airtable secondary, OR Firebase secondary emails
@@ -454,18 +459,25 @@ const findAllProjectsByEmail = async (email, firebaseSecondaryEmails = '') => {
                 },
                 (err) => {
                     if (err) {
+                        console.error(`[FIND ALL PROJECTS] Airtable eachPage error:`, err);
                         reject(err);
                     } else {
+                        console.log(`[FIND ALL PROJECTS] Airtable query completed successfully`);
                         resolve();
                     }
                 }
             );
         });
 
-        console.log(`Found ${allRecords.length} projects for email: ${normalizedEmail}`);
+        console.log(`[FIND ALL PROJECTS] Found ${allRecords.length} projects for email: ${normalizedEmail}`);
         return allRecords;
     } catch (error) {
-        console.error(`Error finding all projects by email ${normalizedEmail}:`, error);
+        console.error(`[FIND ALL PROJECTS] Error finding all projects by email ${normalizedEmail}:`, error);
+        console.error(`[FIND ALL PROJECTS] Error details:`, {
+            message: error.message,
+            statusCode: error.statusCode,
+            error: error.error
+        });
         throw new Error(`Failed to find projects by email.`);
     }
 };
