@@ -32,7 +32,6 @@ import { useProjectData } from "../hooks/useProjectData";
 import { useDocumentManagement } from "../hooks/useDocumentManagement";
 import { usePhotoManagement } from "../hooks/usePhotoManagement";
 import { usePdfEditor } from "../hooks/usePdfEditor";
-import { useCommentLogic } from "../hooks/useCommentLogic";
 import { approveMap } from "../../../services/projectService";
 
 // ==================== Main Component ====================
@@ -79,17 +78,6 @@ const ProjectDetail = () => {
     handlePdfEditorSave,
     handlePdfEditorCancel
   } = usePdfEditor(projectId, project, handleDocumentUpload, loadProjectDetails);
-
-  const {
-    isCommentModalOpen,
-    isSubmittingComment,
-    commentModalMode,
-    pendingDraftMapUpload,
-    openStandaloneCommentModal,
-    handleDraftMapUploadWithComment,
-    handleAddComment,
-    handleCommentModalClose
-  } = useCommentLogic(projectId, setProject, handleDocumentUpload, setError, loadProjectDetails);
 
   // --- Map Approval State & Handler ---
   const [isApprovingMap, setIsApprovingMap] = useState(false);
@@ -680,7 +668,6 @@ const ProjectDetail = () => {
                 slot={slot}
                 files={slot.files}
                 onUpload={handleDocumentUpload}
-                onUploadWithComment={handleDraftMapUploadWithComment}
                 onDelete={handleDocumentDelete}
                 onReplaceAtIndex={handleDocumentReplaceAtIndex}
                 onDeleteAtIndex={handleDocumentDeleteAtIndex}
@@ -689,7 +676,6 @@ const ProjectDetail = () => {
                 isDeleting={docDeleteState.key === slot.key}
                 isAdmin={isAdmin}
                 comments={null} // COMMENTED OUT: slot.key === 'draftMap' ? project?.draftMapComments : null
-                onAddComment={openStandaloneCommentModal}
                 draftMapApproved={project?.draftMapApproved ?? false}
                 finalMapApproved={project?.finalMapApproved ?? false}
                 onApproveMap={handleApproveMap}
