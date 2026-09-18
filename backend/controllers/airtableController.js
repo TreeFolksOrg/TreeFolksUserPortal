@@ -194,10 +194,10 @@ const handleUploadProjectDocument = asyncHandler(async (req, res) => {
              return res.status(401).json({ message: "Unauthorized." });
         }
         
-        // Strict check: Landowners can upload draft maps, photos, and other attachments
-        const allowedTypes = ['draftMap', 'plantingPhotoUrls', 'beforePhotoUrls', 'propertyImageUrls', 'otherAttachments'];
+            // Strict check: Landowners can upload draft maps, landowner submissions, and other attachments
+                const allowedTypes = ['draftMap', 'propertyImageUrls', 'otherAttachments'];
         if (!allowedTypes.includes(documentType)) {
-            return res.status(403).json({ message: "Landowners can only edit the Draft Map, upload photos, or add additional documents." });
+                    return res.status(403).json({ message: "Landowners can only edit the Draft Map, upload landowner submissions, or add additional documents." });
         }
 
         // Use findAllProjectsByEmail to support landowners with multiple projects

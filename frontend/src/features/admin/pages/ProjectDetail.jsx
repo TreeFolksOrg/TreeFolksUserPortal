@@ -444,24 +444,28 @@ const ProjectDetail = () => {
                   </div>
                 </div>
               )}
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <PhotoUploadButton
-                  label="Upload Planting Photo"
-                  slotKey="plantingPhotoUrls"
-                  onUpload={initiatePhotoUpload}
-                  isUploading={photoUploadState.key === "plantingPhotoUrls"}
-                />
-                <PhotoUploadButton
-                  label="Upload Before Photo"
-                  slotKey="beforePhotoUrls"
-                  onUpload={initiatePhotoUpload}
-                  isUploading={photoUploadState.key === "beforePhotoUrls"}
-                />
-              </div>
-              {photoUploadState.error &&
-                ["plantingPhotoUrls", "beforePhotoUrls"].includes(photoUploadState.errorSlot) && (
-                  <p className="text-xs text-red-600">{photoUploadState.error}</p>
-                )}
+              {isAdmin && (
+                <>
+                  <div className="mt-6 flex flex-wrap justify-center gap-3">
+                    <PhotoUploadButton
+                      label="Upload Planting Photo"
+                      slotKey="plantingPhotoUrls"
+                      onUpload={initiatePhotoUpload}
+                      isUploading={photoUploadState.key === "plantingPhotoUrls"}
+                    />
+                    <PhotoUploadButton
+                      label="Upload Before Photo"
+                      slotKey="beforePhotoUrls"
+                      onUpload={initiatePhotoUpload}
+                      isUploading={photoUploadState.key === "beforePhotoUrls"}
+                    />
+                  </div>
+                  {photoUploadState.error &&
+                    ["plantingPhotoUrls", "beforePhotoUrls"].includes(photoUploadState.errorSlot) && (
+                      <p className="text-xs text-red-600">{photoUploadState.error}</p>
+                    )}
+                </>
+              )}
             </div>
 
             <div className="space-y-2">
