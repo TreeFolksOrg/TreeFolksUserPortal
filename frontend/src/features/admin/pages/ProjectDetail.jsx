@@ -458,7 +458,7 @@ const ProjectDetail = () => {
             </div>
             )}
 
-            <div className={`space-y-2 ${!isAdmin ? "mx-auto w-full max-w-5xl" : ""}`}>
+            <div className={`space-y-2 ${!isAdmin ? "mx-auto w-full max-w-2xl" : ""}`}>
               <p className="text-sm font-semibold text-gray-700">
                 Landowner Submissions
                 <span className="ml-2 font-normal text-xs text-gray-400">
