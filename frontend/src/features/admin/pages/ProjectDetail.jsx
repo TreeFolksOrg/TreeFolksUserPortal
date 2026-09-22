@@ -409,7 +409,8 @@ const ProjectDetail = () => {
         )}
 
         <div className="space-y-10">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className={`grid grid-cols-1 gap-6 ${isAdmin ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
+            {isAdmin && (
             <div className="space-y-2">
               <p className="text-sm font-semibold text-gray-700">
                 Planting Photos & Before Photos
@@ -455,8 +456,9 @@ const ProjectDetail = () => {
                 </>
               )}
             </div>
+            )}
 
-            <div className="space-y-2">
+            <div className={`space-y-2 ${!isAdmin ? "mx-auto w-full max-w-5xl" : ""}`}>
               <p className="text-sm font-semibold text-gray-700">
                 Landowner Submissions
                 <span className="ml-2 font-normal text-xs text-gray-400">
