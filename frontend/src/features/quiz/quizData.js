@@ -302,11 +302,15 @@ export const PART_TWO_QUESTIONS = [
     correct: "d",
     explanation: [
       "While an invasive species can be either native or non-native, non-native species are more likely to become invasive. Native species typically become a problem only after humans have altered their habitat or ecosystem to such a degree that the ecosystem is thrown out of balance. An example would be clearing land for cattle grazing combined with the suppression of the natural fire cycle, leading to an overabundance of Ashe juniper (nicknamed cedar). Ashe juniper would normally only be found in ravines and intermixed with oaks and other species — it belongs here, and has spread to areas where it wasn’t found before, due to the chopping down of old-growth forests and overgrazing.",
+      "Below you can see two examples of non-native and notoriously invasive plants found in Texas.",
+      { image: { file: "q11-answer.webp" } },
       "Humans often aid the movement of species around the globe, sometimes with disastrous effects. Sometimes people move these plants, animals, and insects on purpose, such as for pets or gardening, not realizing the harm it will cause. Other times, these species, including pests and pathogens, are accidentally transported, such as when hidden on plants, food, and lumber shipped internationally.",
       "Shockingly, many invasive plants are still sold in gardening centers. So it is up to all of us to ensure we only purchase native plants. They are usually proudly labeled as NATIVE (but just because they say \"Texas\" or have a Texas flag on them doesn’t mean they’re native. Gardening centers often use such deceptive labeling tactics. So, read the label, or better yet, look it up, to check if it is native. By the way, Vitex is NOT native and is, in fact, invasive in many areas. Here is a hint at its origin: it is also called Chinese chaste tree.",
+      "Here are two more examples of invasive plants found in Texas:",
+      { image: { file: "q11-answer2.webp" } },
       "Be careful not to confuse Western soapberry with Chinaberry. Western soapberry is a very hardy native tree that is great for wildlife (and its berries can be used to make soap!). Their seeds look a bit alike, so double-check before you chop.",
     ],
-    answerImages: [{ file: "q11-answer.webp" }, { file: "q11-answer2.webp" }],
+    answerImages: [],
   },
   {
     id: 12,
