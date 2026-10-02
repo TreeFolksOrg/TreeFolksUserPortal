@@ -344,7 +344,7 @@ export const PART_TWO_QUESTIONS = [
       "It also does real work. As you saw in the last question, the endangered Golden-cheeked Warbler nests nowhere on earth but Central Texas, and builds those nests from bark that only mature Ashe juniper — roughly 40 years and older — produces. No old cedar, no warbler. Its berries feed birds and mammals through the winter, and on thin rocky soils, its shade and leaf litter protect the ground where little else will hold. Ashe juniper creates rich soil, and its roots break through limestone, creating cracks through which rainfall can seep into the ground to recharge aquifers and reduce hillside erosion.",
       "You may have heard that cedar drinks more water than other trees, but recent studies show that they consume similar or less amounts of water than live oak trees. The old myth about cedars being “water hogs” was based on a 1996 study of a single tree, but the media ran it, and the misinformation was quickly adopted as fact. This study claimed that all junipers consumed 33 gallons per day, whereas updated studies using better data show they consume closer to 6 gallons per day, depending on weather and size.",
     ],
-    answerImages: [],
+    answerImages: [{ file: "q13-answer.webp" }, { file: "q13-answer2.webp" }],
   },
   {
     id: 14,
@@ -361,7 +361,7 @@ export const PART_TWO_QUESTIONS = [
       "And it does more than that. Mesquite shelters seedlings of other species while they get established, its pods feed cattle, deer, turkey, and quail, and its flowers are a serious nectar source used by pollinators — mesquite honey exists for a reason.",
       "As with cedar, what changed was density rather than belonging. Overgrazing removed the grass that carried fire, cattle spread the seed, and open savanna thickened into brush. Thinning a thicket can make sense. Writing mesquite off as a weed with no value does not.",
     ],
-    answerImages: [],
+    answerImages: [{ file: "q14-answer.webp" }, { file: "q14-answer2.webp" }],
   },
   {
     id: 15,
