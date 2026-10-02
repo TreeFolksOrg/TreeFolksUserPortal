@@ -12,6 +12,7 @@ import LandownerDashboard from "./features/landowner/pages/LandownerDashboard";
 import ProtectedRoute from "./features/auth/ProtectedRoute";
 import LoginPage from "./features/auth/pages/LoginPage";
 import AccountPage from "./features/auth/pages/AccountPage";
+import QuizPage from "./features/quiz/pages/QuizPage";
 import { useAuth } from "./features/auth/AuthProvider";
 
 function App() {
@@ -27,6 +28,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to={defaultRedirect} replace />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/quiz"
+          element={
+            <ProtectedRoute disallowAdmin>
+              <QuizPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin"
           element={

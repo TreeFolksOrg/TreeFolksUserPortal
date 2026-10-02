@@ -332,5 +332,35 @@ export const approveMap = async (projectId, mapType, approved) => {
   }
 };
 
+/**
+ * Save pre-consultation quiz results to a project.
+ * @param {string} projectId - The project's Airtable record ID
+ * @param {{answers: string, scorePercent: number, completedDate: string}} results - completedDate is YYYY-MM-DD
+ * @returns {Promise<object>} Normalized updated project
+ */
+export const submitPreConsultQuiz = async (projectId, results) => {
+  try {
+    const response = await apiClient.post(
+      `/projects/${encodeURIComponent(projectId)}/quiz-pre`,
+      results
+    );
+
+    if (!response?.data?.success) {
+      throw new Error(response?.data?.message || 'Failed to save quiz results');
+    }
+
+    resetSeasonProjectsCache();
+
+    return normalizeProjectRecord(response.data.project);
+  } catch (error) {
+    console.error(`API Call: submitPreConsultQuiz(${projectId}) -> Failed.`, error);
+    throw new Error(
+      error?.response?.data?.message ||
+      error?.message ||
+      'Failed to save quiz results.'
+    );
+  }
+};
+
 // Re-export cache management function from apiHelpers
 export { resetSeasonProjectsCache } from './apiHelpers';

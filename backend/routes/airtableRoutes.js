@@ -62,6 +62,9 @@ router.post('/sync-secondary-emails', airtableController.handleSyncSecondaryEmai
 // PATCH approve/unapprove a map (draft or final) - Landowners can approve their own maps
 router.patch('/projects/:recordId/approve-map', airtableController.handleApproveMap);
 
+// POST pre-consultation quiz results - Landowners can submit for their own projects
+router.post('/projects/:recordId/quiz-pre', airtableController.handleSubmitPreConsultQuiz);
+
 // POST a comment to the draft map - Landowner interaction
 // COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
 // router.post('/projects/:recordId/draft-map/comments', airtableController.handleAddDraftMapComment);

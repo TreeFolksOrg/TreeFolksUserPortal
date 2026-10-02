@@ -686,6 +686,50 @@ const handleApproveMap = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * Saves a landowner's pre-consultation quiz results to their project record.
+ */
+const handleSubmitPreConsultQuiz = asyncHandler(async (req, res) => {
+    const { recordId } = req.params;
+    const { answers, scorePercent, completedDate } = req.body || {};
+
+    if (typeof answers !== 'string' || !answers.trim() || answers.length > 20000) {
+        return res.status(400).json({ message: 'Quiz answers are required.' });
+    }
+    if (typeof scorePercent !== 'number' || !Number.isFinite(scorePercent) || scorePercent < 0 || scorePercent > 100) {
+        return res.status(400).json({ message: 'Score must be a number between 0 and 100.' });
+    }
+    if (typeof completedDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(completedDate)) {
+        return res.status(400).json({ message: 'Completion date must be in YYYY-MM-DD format.' });
+    }
+
+    if (!req.user || !req.user.email) {
+        return res.status(401).json({ message: 'Unauthorized.' });
+    }
+
+    if (!req.user.admin) {
+        const landownerProjects = await airtableService.findAllProjectsByEmail(req.user.email, req.user.secondaryEmails || '');
+        if (!landownerProjects.some(project => project.id === recordId)) {
+            return res.status(403).json({ message: 'Access denied to this project.' });
+        }
+    }
+
+    try {
+        const updatedProject = await airtableService.updateProject(recordId, {
+            quizAnswersPre: answers.trim(),
+            quizScorePreConsultation: `${Math.round(scorePercent)}%`,
+            quizDatePre: completedDate,
+        });
+        res.json({ success: true, project: updatedProject });
+    } catch (error) {
+        console.error(`Error saving pre-consult quiz for ${recordId}:`, error);
+        if (error.message.includes('Record not found')) {
+            return res.status(404).json({ message: 'Project not found.' });
+        }
+        res.status(500).json({ message: 'Failed to save quiz results.' });
+    }
+});
+
 module.exports = {
     handleGetAllSeasons,
     handleGetProjectsBySeason,
@@ -703,5 +747,6 @@ module.exports = {
     handleUpdateSecondaryEmails,
     handleSyncSecondaryEmails,
     handleApproveMap,
+    handleSubmitPreConsultQuiz,
     // handleAddDraftMapComment, // COMMENTED OUT - Draft Map Comments field doesn't exist
 };

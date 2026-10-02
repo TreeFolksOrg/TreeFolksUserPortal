@@ -94,6 +94,7 @@ const FIELD_DEFINITIONS = [
     { api: 'totalTrees', airtable: '🌳-TOTAL Trees' },
     { api: 'quizScorePreConsultation', airtable: '📝-Quiz-Pre-consult' },
     { api: 'quizDatePre', airtable: '📝-Quiz Date-Pre' },
+    { api: 'quizAnswersPre', airtable: '📝-Quiz-Pre-Answers' },
     { api: 'quizScorePostPlanting', airtable: '📝-Quiz-Post-Planting' },
     { api: 'participationStatus', airtable: '⭐-Overview Status' },
 

@@ -33,6 +33,7 @@ import { useDocumentManagement } from "../hooks/useDocumentManagement";
 import { usePhotoManagement } from "../hooks/usePhotoManagement";
 import { usePdfEditor } from "../hooks/usePdfEditor";
 import { approveMap } from "../../../services/projectService";
+import { saveQuizProjectId } from "../../quiz/quizProject";
 
 // ==================== Main Component ====================
 
@@ -385,14 +386,14 @@ const ProjectDetail = () => {
               <p className="font-medium">It looks like you haven't taken the quiz!</p>
               <p className="mt-1">
                 Please take it here:{" "}
-                <a
-                  href="https://form.jotform.com/221146225833147"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/quiz"
+                  state={{ projectId }}
+                  onClick={() => saveQuizProjectId(projectId)}
                   className="font-semibold underline hover:text-blue-900"
                 >
                   Pre-Consultation Quiz
-                </a>
+                </Link>
               </p>
             </div>
           </div>
