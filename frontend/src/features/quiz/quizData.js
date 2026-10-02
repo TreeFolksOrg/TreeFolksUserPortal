@@ -402,10 +402,11 @@ export const PART_TWO_QUESTIONS = [
     correct: "b",
     explanation: [
       "Please DO NOT MOW the area to be planted. Through this program, participants create \"Grow Zones\" in areas considered for reforestation. If you are able to seed native grasses and wildflowers in the planting areas, it will not only help wildlife and prevent further erosion but also protect the trees we plant on your property and look beautiful! If you do not plan to seed your planting areas, you can simply stop mowing and fence out livestock from grazing them.",
+      { image: { file: "q17-answer.webp" } },
       "Please avoid disturbing the native vegetation, downed limbs, boulders, etc., and avoid anything that disturbs or exposes the soil. This is the best way to prepare the area for planting and will prevent you from accidentally mowing down the trees that TreeFolks plants for you.",
       "Don’t mow; let it grow!",
     ],
-    answerImages: [{ file: "q17-answer.webp" }, { file: "q17-answer2.webp" }],
+    answerImages: [{ file: "q17-answer2.webp" }],
   },
   {
     id: 18,

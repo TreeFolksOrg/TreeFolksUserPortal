@@ -266,7 +266,9 @@ const QuizPage = () => {
 
         <div className="mt-6">
           <p className={`font-semibold ${isCorrect ? "text-green-700" : "text-gray-900"}`}>
-            {isCorrect ? "Correct! " : ""}Correct answer: {correctOption.key}. {correctOption.text}
+            {isCorrect
+              ? "Correct!"
+              : `Correct answer: ${correctOption.key}. ${correctOption.text}`}
           </p>
           <div className="mt-3 space-y-3 text-sm leading-relaxed text-gray-700">
             {q.explanation.map((item, i) =>
@@ -297,7 +299,16 @@ const QuizPage = () => {
   const renderClosing = () => (
     <>
       <h1 className="text-3xl font-semibold text-gray-900">{CLOSING.title}</h1>
-      <p className="mt-4 text-lg font-semibold text-green-600">
+
+      <div className="mt-4 space-y-3 text-sm leading-relaxed text-gray-700">
+        {CLOSING.paragraphs.map((paragraph, i) => (
+          <p key={i}>{paragraph}</p>
+        ))}
+      </div>
+
+      <QuizImage image={{ file: CLOSING.image }} alt="End of quiz" />
+
+      <p className="mt-8 text-lg font-semibold text-green-600">
         Your Score: {correctCount}/{totalQuestions} ({scorePercent}%)
       </p>
 
@@ -313,14 +324,6 @@ const QuizPage = () => {
         disabled={submitting}
         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
       />
-
-      <QuizImage image={{ file: CLOSING.image }} alt="End of quiz" />
-
-      <div className="mt-6 space-y-3 text-sm leading-relaxed text-gray-700">
-        {CLOSING.paragraphs.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
-      </div>
 
       {error && (
         <div className="mt-6 flex items-center justify-center rounded-lg bg-red-100 p-3 text-center text-red-500 shadow-sm">
