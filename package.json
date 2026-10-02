@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "TreeFolks User Portal - Full-stack application for tracking tree planting projects",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "scripts": {
     "start": "cd backend && npm start",

@@ -26,7 +26,6 @@ dist-ssr
 **/.env
 **/.DS_Store
 backend/uploads
-frontend/public
 
 # Python virtual environment (not needed for deployment)
 venv/
