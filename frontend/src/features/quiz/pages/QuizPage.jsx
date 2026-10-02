@@ -269,9 +269,13 @@ const QuizPage = () => {
             {isCorrect ? "Correct! " : ""}Correct answer: {correctOption.key}. {correctOption.text}
           </p>
           <div className="mt-3 space-y-3 text-sm leading-relaxed text-gray-700">
-            {q.explanation.map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
+            {q.explanation.map((item, i) =>
+              typeof item === "string" ? (
+                <p key={i}>{item}</p>
+              ) : (
+                <QuizImage key={i} image={item.image} alt={`Question ${q.id} explanation`} />
+              )
+            )}
           </div>
         </div>
 

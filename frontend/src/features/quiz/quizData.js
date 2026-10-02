@@ -108,7 +108,6 @@ export const PART_TWO_QUESTIONS = [
   {
     id: 2,
     text: "What is a watershed?",
-    image: { file: "q2.webp" },
     options: [
       { key: "a", text: "A small dam which allows water to run over the top" },
       { key: "b", text: "A low-lying water retention area, also known as a retention pond" },
@@ -121,16 +120,7 @@ export const PART_TWO_QUESTIONS = [
       "This is also why rain falling on your neighbor’s hill is your business, and why what happens on your land is your neighbor’s. Everything inside the funnel is connected, whether or not you can see water from where you are standing.",
       "Note that answer d. describes a riparian zone — the answer to the previous question. The two get mixed up constantly, which is why they are worth learning together.",
     ],
-    answerImages: [
-      {
-        file: "q2-answer caption-Meredith McCord from Houston holds over 100 fishing world records.webp",
-        caption: "Meredith McCord from Houston holds over 100 fishing world records",
-      },
-      {
-        file: "q2-answer2 caption-Geronimo Creek.webp",
-        caption: "Geronimo Creek",
-      },
-    ],
+    answerImages: [{ file: "q2-answer.webp" }],
   },
   {
     id: 3,
@@ -147,7 +137,16 @@ export const PART_TWO_QUESTIONS = [
       "And the wider, the better. A streambank is a hotspot for a variety of plant life, which creates habitat for animals both on land and in the water. And healthier streams can lead to more, bigger, and healthier fish!",
       "As you’ll see in this quiz, abundant plant and wildlife are just one measure of the health of a riparian zone. Disruptions to the balance can cause erosion, lower the water table, and carry pollutants and excessive sediment loads. Wide riparian forest buffers with diverse plant communities provide the most ecological benefits to streams, wildlife, and humans.",
     ],
-    answerImages: [{ file: "q3-answer.webp" }],
+    answerImages: [
+      {
+        file: "q3-answer caption-Meredith McCord from Houston holds over 100 fishing world records.webp",
+        caption: "Meredith McCord from Houston holds over 100 fishing world records",
+      },
+      {
+        file: "q3-answer2 caption-Geronimo Creek.webp",
+        caption: "Geronimo Creek",
+      },
+    ],
   },
   {
     id: 4,
@@ -166,7 +165,7 @@ export const PART_TWO_QUESTIONS = [
       "c. Reduced state and local fees, water bill, and/or taxes: Reduced pollution and sediments entering waterways can reduce strain on water treatment plants, thus reducing your fees, water bill, and/or taxes.",
       "d. Increased property values: Mature trees add value to a property, and property values also remain higher due to reduced loss of acreage to erosion and a more lush landscape.",
     ],
-    answerImages: [],
+    answerImages: [{ file: "q4-answer.webp" }],
   },
   {
     id: 5,
@@ -275,12 +274,18 @@ export const PART_TWO_QUESTIONS = [
     correct: "a",
     explanation: [
       "The truth is, shrubs, smaller trees, and briars are not a reliable way to keep livestock out of a riparian zone. Livestock should be fenced out of sensitive riparian areas where they are likely to spend most of their time in the shade and near the water. Rotational grazing, limited stream access points, and watering tanks/ponds away from the stream are alternatives to unrestricted access to the streambanks.",
+      { image: { file: "q10-answer.webp" } },
       "Size diversity DOES provide the following benefits:",
       "b. It helps maintain cooler water temperatures, which is important for fish and other aquatic organisms. Fish are sensitive to increases in water temperature.",
       "c. It reduces the speed of floodwaters by creating resistance to passing water.",
       "d. It prevents raindrops from directly impacting the ground, thus reducing erosion. Raindrops can act like thousands of tiny hammer blows, loosening the soil. They can then wash the soil into the stream, eroding the land and the streambank. Many layers of vegetation slow down raindrops and lessen their impact on soil.",
     ],
-    answerImages: [{ file: "q10-answer.webp" }, { file: "q10-answer2.webp" }],
+    answerImages: [
+      {
+        file: "q10-answer2 caption-(New Espada Lake, part of the San Antonio River within San Antonio.).webp",
+        caption: "(New Espada Lake, part of the San Antonio River within San Antonio.)",
+      },
+    ],
   },
   {
     id: 11,
