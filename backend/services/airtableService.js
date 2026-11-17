@@ -96,6 +96,9 @@ const FIELD_DEFINITIONS = [
     { api: 'quizDatePre', airtable: '📝-Quiz Date-Pre' },
     { api: 'quizAnswersPre', airtable: '📝-Quiz-Pre-Answers' },
     { api: 'quizScorePostPlanting', airtable: '📝-Quiz-Post-Planting' },
+    // Write-only: never requested on reads, so a missing Airtable column can't break project loading.
+    { api: 'quizDatePost', airtable: '📝-Quiz Date-Post', writeOnly: true },
+    { api: 'quizAnswersPost', airtable: '📝-Quiz-Post-Answers', writeOnly: true },
     { api: 'participationStatus', airtable: '⭐-Overview Status' },
 
     // Maps & Documents (Using Url suffix to match Read logic and Attachment handling)
@@ -122,9 +125,9 @@ const buildFieldMaps = () => {
     const airtableToApi = {};
 
     FIELD_DEFINITIONS.forEach(def => {
-        const { airtable, api } = def;
+        const { airtable, api, writeOnly } = def;
         if (airtable && api) {
-            airtableToApi[airtable] = api;
+            if (!writeOnly) airtableToApi[airtable] = api;
             apiToAirtable[api] = airtable;
         }
     });

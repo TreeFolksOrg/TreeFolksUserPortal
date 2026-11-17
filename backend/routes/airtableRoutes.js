@@ -65,6 +65,9 @@ router.patch('/projects/:recordId/approve-map', airtableController.handleApprove
 // POST pre-consultation quiz results - Landowners can submit for their own projects
 router.post('/projects/:recordId/quiz-pre', airtableController.handleSubmitPreConsultQuiz);
 
+// POST post-planting quiz results (includes optional program feedback survey)
+router.post('/projects/:recordId/quiz-post', airtableController.handleSubmitPostPlantingQuiz);
+
 // POST a comment to the draft map - Landowner interaction
 // COMMENTED OUT - Draft Map Comments field doesn't exist in Airtable
 // router.post('/projects/:recordId/draft-map/comments', airtableController.handleAddDraftMapComment);

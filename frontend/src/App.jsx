@@ -37,6 +37,14 @@ function App() {
           }
         />
         <Route
+          path="/quiz/post-planting"
+          element={
+            <ProtectedRoute disallowAdmin>
+              <QuizPage key="post" variant="post" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin"
           element={
             <ProtectedRoute requiresAdmin>

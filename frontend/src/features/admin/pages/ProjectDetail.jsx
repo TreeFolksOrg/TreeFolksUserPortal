@@ -377,6 +377,30 @@ const ProjectDetail = () => {
         />
       )}
 
+      {/* Post-Planting Quiz Banner: shown once the planting date has passed */}
+      {!isAdmin && project.quizScorePreConsultation && !project.quizScorePostPlanting &&
+        project.plantingDate && new Date(`${project.plantingDate.slice(0, 10)}T00:00:00`) <= new Date() && (
+        <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-auto max-w-7xl">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
+            <div className="text-sm text-blue-700">
+              <p className="font-medium">Your trees are in the ground! Please take the post-planting quiz.</p>
+              <p className="mt-1">
+                Please take it here:{" "}
+                <Link
+                  to="/quiz/post-planting"
+                  state={{ projectId }}
+                  onClick={() => saveQuizProjectId(projectId)}
+                  className="font-semibold underline hover:text-blue-900"
+                >
+                  Post-Planting Quiz
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quiz Completion Banner for Landowners */}
       {!isAdmin && !project.quizScorePreConsultation && (
         <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 mx-auto max-w-7xl">

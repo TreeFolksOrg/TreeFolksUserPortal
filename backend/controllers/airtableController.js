@@ -686,14 +686,21 @@ const handleApproveMap = asyncHandler(async (req, res) => {
     }
 });
 
+const QUIZ_FIELDS = {
+    pre: { label: 'pre-consult', answers: 'quizAnswersPre', score: 'quizScorePreConsultation', date: 'quizDatePre' },
+    post: { label: 'post-planting', answers: 'quizAnswersPost', score: 'quizScorePostPlanting', date: 'quizDatePost' },
+};
+
 /**
- * Saves a landowner's pre-consultation quiz results to their project record.
+ * Builds a handler that saves a landowner's quiz results (pre-consultation or post-planting)
+ * to their project record.
  */
-const handleSubmitPreConsultQuiz = asyncHandler(async (req, res) => {
+const makeQuizSubmitHandler = (phase) => asyncHandler(async (req, res) => {
+    const fields = QUIZ_FIELDS[phase];
     const { recordId } = req.params;
     const { answers, scorePercent, completedDate } = req.body || {};
 
-    if (typeof answers !== 'string' || !answers.trim() || answers.length > 20000) {
+    if (typeof answers !== 'string' || !answers.trim() || answers.length > 50000) {
         return res.status(400).json({ message: 'Quiz answers are required.' });
     }
     if (typeof scorePercent !== 'number' || !Number.isFinite(scorePercent) || scorePercent < 0 || scorePercent > 100) {
@@ -716,19 +723,22 @@ const handleSubmitPreConsultQuiz = asyncHandler(async (req, res) => {
 
     try {
         const updatedProject = await airtableService.updateProject(recordId, {
-            quizAnswersPre: answers.trim(),
-            quizScorePreConsultation: `${Math.round(scorePercent)}%`,
-            quizDatePre: completedDate,
+            [fields.answers]: answers.trim(),
+            [fields.score]: `${Math.round(scorePercent)}%`,
+            [fields.date]: completedDate,
         });
         res.json({ success: true, project: updatedProject });
     } catch (error) {
-        console.error(`Error saving pre-consult quiz for ${recordId}:`, error);
+        console.error(`Error saving ${fields.label} quiz for ${recordId}:`, error);
         if (error.message.includes('Record not found')) {
             return res.status(404).json({ message: 'Project not found.' });
         }
         res.status(500).json({ message: 'Failed to save quiz results.' });
     }
 });
+
+const handleSubmitPreConsultQuiz = makeQuizSubmitHandler('pre');
+const handleSubmitPostPlantingQuiz = makeQuizSubmitHandler('post');
 
 module.exports = {
     handleGetAllSeasons,
@@ -748,5 +758,6 @@ module.exports = {
     handleSyncSecondaryEmails,
     handleApproveMap,
     handleSubmitPreConsultQuiz,
+    handleSubmitPostPlantingQuiz,
     // handleAddDraftMapComment, // COMMENTED OUT - Draft Map Comments field doesn't exist
 };

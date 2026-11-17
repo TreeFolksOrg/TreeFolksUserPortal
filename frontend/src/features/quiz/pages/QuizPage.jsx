@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, CheckCircle2, Loader2, XCircle } from "lucide-react";
 import TreeFolks from "../../../assets/icons/treefolks.svg?react";
-import { submitPreConsultQuiz } from "../../../services/projectService";
+import { submitPostPlantingQuiz, submitPreConsultQuiz } from "../../../services/projectService";
 import { clearQuizProjectId, getQuizProjectId } from "../quizProject";
 import {
   CLOSING,
@@ -10,7 +10,14 @@ import {
   PART_ONE_QUESTIONS,
   PART_TWO_INTRO,
   PART_TWO_QUESTIONS,
+  POST_PART_ONE_INTRO,
+  SURVEY,
 } from "../quizData";
+
+const VARIANTS = {
+  pre: { partOneIntro: PART_ONE_INTRO, submit: submitPreConsultQuiz, hasSurvey: false },
+  post: { partOneIntro: POST_PART_ONE_INTRO, submit: submitPostPlantingQuiz, hasSurvey: true },
+};
 
 const imageUrl = (file) => encodeURI(`/${file}`);
 
@@ -49,7 +56,7 @@ const NextButton = ({ onClick, disabled, loading, children }) => (
   </div>
 );
 
-const OptionList = ({ name, options, selected, onSelect }) => (
+const OptionList = ({ name, options, selected, onSelect, hideKeys = false }) => (
   <div className="mt-4 space-y-2">
     {options.map((option) => (
       <label
@@ -69,7 +76,8 @@ const OptionList = ({ name, options, selected, onSelect }) => (
           className="mt-0.5 mr-3 h-4 w-4 accent-green-600"
         />
         <span>
-          <span className="font-medium">{option.key}.</span> {option.text}
+          {!hideKeys && <span className="font-medium">{option.key}. </span>}
+          {option.text}
         </span>
       </label>
     ))}
@@ -107,7 +115,45 @@ const ResultOptionList = ({ options, selected, correct }) => (
   </div>
 );
 
-const QuizPage = () => {
+const RatingScale = ({ name, selected, onSelect, lowLabel, highLabel }) => (
+  <div className="mt-4">
+    <div className="flex gap-2">
+      {[1, 2, 3, 4, 5].map((value) => (
+        <label
+          key={value}
+          className={`flex h-12 flex-1 cursor-pointer items-center justify-center rounded-lg border text-base font-semibold transition sm:max-w-[4rem] ${
+            selected === value
+              ? "border-green-500 bg-green-50 text-green-800"
+              : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          <input
+            type="radio"
+            name={name}
+            value={value}
+            checked={selected === value}
+            onChange={() => onSelect(value)}
+            className="sr-only"
+          />
+          {value}
+        </label>
+      ))}
+    </div>
+    <div className="mt-1 flex justify-between text-xs text-gray-500 sm:max-w-[22rem]">
+      <span>1 = {lowLabel}</span>
+      <span>5 = {highLabel}</span>
+    </div>
+  </div>
+);
+
+const formatSurveyAnswer = (question, value) => {
+  if (question.type === "rating") return `${value} out of 5`;
+  if (question.type === "choice") return question.options.find((o) => o.key === value)?.text;
+  return value;
+};
+
+const QuizPage = ({ variant = "pre" }) => {
+  const { partOneIntro, submit, hasSurvey } = VARIANTS[variant];
   const location = useLocation();
   const navigate = useNavigate();
   const [projectId] = useState(() => location.state?.projectId || getQuizProjectId());
@@ -115,6 +161,7 @@ const QuizPage = () => {
   const [step, setStep] = useState({ kind: "part1" });
   const [partOneAnswers, setPartOneAnswers] = useState({});
   const [partTwoAnswers, setPartTwoAnswers] = useState({});
+  const [surveyAnswers, setSurveyAnswers] = useState({});
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -153,6 +200,18 @@ const QuizPage = () => {
       return `${q.id}. ${q.text}\n   ${option.key}. ${option.text}`;
     });
     let text = `Part 1 — Land Management Style\n\n${lines.join("\n\n")}`;
+    if (hasSurvey) {
+      const surveyLines = SURVEY.questions
+        .map((q) => {
+          const raw = surveyAnswers[q.id];
+          const value = typeof raw === "string" ? raw.trim() : raw;
+          return value ? `${q.text}\n   ${formatSurveyAnswer(q, value)}` : null;
+        })
+        .filter(Boolean);
+      text += `\n\nProgram Feedback Survey\n\n${
+        surveyLines.length ? surveyLines.join("\n\n") : "(No responses)"
+      }`;
+    }
     if (comment.trim()) {
       text += `\n\nComments: ${comment.trim()}`;
     }
@@ -163,7 +222,7 @@ const QuizPage = () => {
     setSubmitting(true);
     setError(null);
     try {
-      await submitPreConsultQuiz(projectId, {
+      await submit(projectId, {
         answers: buildAnswersText(),
         scorePercent,
         completedDate: toLocalDateString(new Date()),
@@ -180,11 +239,11 @@ const QuizPage = () => {
     const allAnswered = PART_ONE_QUESTIONS.every((q) => partOneAnswers[q.id]);
     return (
       <>
-        <h1 className="text-3xl font-semibold text-gray-900">{PART_ONE_INTRO.title}</h1>
-        <p className="mt-4 text-sm text-gray-600">{PART_ONE_INTRO.description}</p>
+        <h1 className="text-3xl font-semibold text-gray-900">{partOneIntro.title}</h1>
+        <p className="mt-4 text-sm text-gray-600">{partOneIntro.description}</p>
         <div className="mt-4 border-l-4 border-blue-400 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-          <p className="font-medium">{PART_ONE_INTRO.streamNoteTitle}</p>
-          <p className="mt-1">{PART_ONE_INTRO.streamNote}</p>
+          <p className="font-medium">{partOneIntro.streamNoteTitle}</p>
+          <p className="mt-1">{partOneIntro.streamNote}</p>
         </div>
 
         <div className="mt-8 space-y-8">
@@ -287,7 +346,11 @@ const QuizPage = () => {
 
         <NextButton
           onClick={() =>
-            setStep(isLast ? { kind: "closing" } : { kind: "question", index: index + 1 })
+            setStep(
+              isLast
+                ? { kind: hasSurvey ? "survey" : "closing" }
+                : { kind: "question", index: index + 1 }
+            )
           }
         >
           Next
@@ -295,6 +358,57 @@ const QuizPage = () => {
       </>
     );
   };
+
+  const setSurveyAnswer = (id, value) =>
+    setSurveyAnswers((prev) => ({ ...prev, [id]: value }));
+
+  const renderSurvey = () => (
+    <>
+      <h1 className="text-3xl font-semibold text-gray-900">{SURVEY.title}</h1>
+      <p className="mt-4 text-sm text-gray-600">{SURVEY.description}</p>
+      <div className="mt-4 border-l-4 border-amber-400 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+        {SURVEY.reminder}
+      </div>
+
+      <div className="mt-8 space-y-8">
+        {SURVEY.questions.map((q) => (
+          <fieldset key={q.id}>
+            <legend className="text-base font-semibold text-gray-900">{q.text}</legend>
+            {q.type === "rating" && (
+              <RatingScale
+                name={`survey-${q.id}`}
+                selected={surveyAnswers[q.id]}
+                onSelect={(value) => setSurveyAnswer(q.id, value)}
+                lowLabel={q.lowLabel}
+                highLabel={q.highLabel}
+              />
+            )}
+            {q.type === "choice" && (
+              <OptionList
+                name={`survey-${q.id}`}
+                options={q.options}
+                selected={surveyAnswers[q.id]}
+                onSelect={(key) => setSurveyAnswer(q.id, key)}
+                hideKeys
+              />
+            )}
+            {q.type === "text" && (
+              <textarea
+                rows={4}
+                maxLength={2000}
+                aria-label={q.text}
+                value={surveyAnswers[q.id] || ""}
+                onChange={(e) => setSurveyAnswer(q.id, e.target.value)}
+                className="mt-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+              />
+            )}
+          </fieldset>
+        ))}
+      </div>
+
+      <NextButton onClick={() => setStep({ kind: "closing" })}>Next</NextButton>
+    </>
+  );
 
   const renderClosing = () => (
     <>
@@ -347,6 +461,7 @@ const QuizPage = () => {
           {step.kind === "part1" && renderPartOne()}
           {step.kind === "question" && renderQuestion(step.index)}
           {step.kind === "answer" && renderAnswer(step.index)}
+          {step.kind === "survey" && renderSurvey()}
           {step.kind === "closing" && renderClosing()}
         </main>
       </div>

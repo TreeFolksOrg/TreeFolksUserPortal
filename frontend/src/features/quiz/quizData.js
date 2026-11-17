@@ -1,4 +1,4 @@
-// Content for the pre-consultation quiz. Image files live in /public and are
+// Content for the pre-consultation and post-planting quizzes. Image files live in /public and are
 // referenced by exact filename (captions are also encoded in some filenames).
 
 export const PART_ONE_INTRO = {
@@ -8,6 +8,13 @@ export const PART_ONE_INTRO = {
   streamNoteTitle: "“Stream”",
   streamNote:
     "In this quiz, we will use the word “stream” to refer to any body of water, including creeks, streams, rivers, and ponds. If your land does not include an actual stream, think of the part of your land most downhill or within the flood zone when answering questions about your land.",
+};
+
+// The post-planting quiz asks the same Part 1 questions; only the intro differs.
+export const POST_PART_ONE_INTRO = {
+  ...PART_ONE_INTRO,
+  description:
+    "There are no right or wrong answers to these first 6 questions. We are simply trying to understand how participation in our program has affected your land management style. You answered these same questions before planting.",
 };
 
 export const PART_TWO_INTRO = {
@@ -23,6 +30,59 @@ export const CLOSING = {
   paragraphs: [
     "Thank you for helping us reforest Central Texas floodplains!",
     "As President LBJ said, “Saving the water and the soil must start where the first raindrop falls.” This is especially true in Texas, where more than 90% of the land is privately owned. So, thank you, landowner, for doing your part to protect the waters and soils of Texas!",
+  ],
+};
+
+export const SURVEY = {
+  title: "Optional Program Feedback Survey",
+  description:
+    "Please help us improve the program by answering a few questions about TreeFolks' Central Texas Floodplain Reforestation Program. We appreciate your sincere constructive criticism. Please give us any suggestions you feel we could implement to improve our service to you and future landowners who participate in this program.",
+  reminder: "Don't forget to continue on until you hit the Submit button on the next page!",
+  questions: [
+    {
+      id: "rating",
+      type: "rating",
+      text: "Please rate your experience with CTFRP.",
+      lowLabel: "Poor",
+      highLabel: "Excellent",
+    },
+    { id: "ratingReason", type: "text", text: "Please tell us why you gave us this rating." },
+    {
+      id: "learned",
+      type: "choice",
+      text: "Did you learn something by participating in this program?",
+      options: [
+        { key: "yes", text: "Yes" },
+        { key: "no", text: "No" },
+      ],
+    },
+    { id: "learnedWhat", type: "text", text: "If so, what did you learn?" },
+    { id: "favorite", type: "text", text: "What was your favorite aspect of the program?" },
+    { id: "improve", type: "text", text: "How do you think our program could improve?" },
+    {
+      id: "practiceChanges",
+      type: "text",
+      text: "Do you plan to change any land management practices after participating in this program? (If so, what will you change?)",
+    },
+    {
+      id: "continuedSupport",
+      type: "text",
+      text: "How can TreeFolks offer you continued support in the future?",
+    },
+    {
+      id: "barriers",
+      type: "text",
+      text: "Did you experience any barriers to participating in the program, other than the 26 year commitment?",
+    },
+    {
+      id: "quoteName",
+      type: "choice",
+      text: "If we choose to quote any of your responses in fundraising efforts, etc, would you like us to include your name?",
+      options: [
+        { key: "yes", text: "Yes, feel free to include my name in any fundraising/promo quotes!" },
+        { key: "no", text: "No, I'd rather remain anonymous if you choose to use my quotes." },
+      ],
+    },
   ],
 };
 
